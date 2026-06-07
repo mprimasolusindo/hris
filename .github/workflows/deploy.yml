@@ -41,7 +41,8 @@ jobs:
 
           SSH_CMD=(sshpass -e ssh -p "${SSH_PORT}" -o StrictHostKeyChecking=accept-new)
 
-          "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "mkdir -p '${DEPLOY_PATH}'"
+          "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" \
+            "if [[ ! -d '${DEPLOY_PATH}' ]]; then echo \"ERROR: ${DEPLOY_PATH} does not exist. Create it in Plesk (or ask your host) before deploying.\"; exit 1; fi; if [[ ! -w '${DEPLOY_PATH}' ]]; then echo \"ERROR: ${DEPLOY_PATH} is not writable by ${USER}.\"; exit 1; fi"
 
           tar czf - \
             --exclude='./.git' \
@@ -67,6 +68,11 @@ jobs:
             "${SSH_USER}@${SSH_HOST}" \
             "DEPLOY_PATH='${DEPLOY_PATH}' REMOTE_PHP='${REMOTE_PHP}' REMOTE_COMPOSER='${REMOTE_COMPOSER}' REMOTE_NPM='${REMOTE_NPM}' bash -s" <<'REMOTE_SCRIPT'
           set -euo pipefail
+
+          if [[ ! -d "${DEPLOY_PATH}" ]]; then
+            echo "ERROR: ${DEPLOY_PATH} does not exist."
+            exit 1
+          fi
 
           cd "${DEPLOY_PATH}"
 
