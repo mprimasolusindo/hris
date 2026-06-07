@@ -1,0 +1,90 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+env:
+  SSH_HOST: 31.97.190.61
+  SSH_PORT: "22"
+  SSH_USER: hrismps
+  DEPLOY_PATH: /var/www/vhosts/mitraprimasolusindo.com/hris
+  # Override in GitHub repo Variables if Plesk uses non-default paths.
+  REMOTE_PHP: php
+  REMOTE_COMPOSER: composer
+  REMOTE_NPM: npm
+
+jobs:
+  deploy:
+    name: Rsync and build on server
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install rsync and sshpass
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rsync sshpass
+
+      - name: Sync application files
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          RSYNC_SSH="sshpass -e ssh -p ${SSH_PORT} -o StrictHostKeyChecking=accept-new"
+
+          rsync -az --delete \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude '.specstory/' \
+            --exclude 'node_modules/' \
+            --exclude 'vendor/' \
+            --exclude '.env' \
+            --exclude 'storage/' \
+            --exclude 'bootstrap/cache/' \
+            --exclude 'public/build/' \
+            --exclude 'public/hot' \
+            --exclude 'public/storage' \
+            -e "${RSYNC_SSH}" \
+            ./ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+
+      - name: Install dependencies and optimize on server
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          sshpass -e ssh -p "${SSH_PORT}" -o StrictHostKeyChecking=accept-new \
+            "${SSH_USER}@${SSH_HOST}" \
+            "DEPLOY_PATH='${DEPLOY_PATH}' REMOTE_PHP='${REMOTE_PHP}' REMOTE_COMPOSER='${REMOTE_COMPOSER}' REMOTE_NPM='${REMOTE_NPM}' bash -s" <<'REMOTE_SCRIPT'
+          set -euo pipefail
+
+          cd "${DEPLOY_PATH}"
+
+          if [[ ! -f .env ]]; then
+            echo "ERROR: ${DEPLOY_PATH}/.env is missing. Create it on the server before deploying."
+            exit 1
+          fi
+
+          "${REMOTE_COMPOSER}" install --no-dev --optimize-autoloader --no-interaction
+          "${REMOTE_NPM}" ci
+          "${REMOTE_NPM}" run build
+
+          mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
+          chmod -R ug+rwx storage bootstrap/cache
+
+          "${REMOTE_PHP}" artisan storage:link --force
+          "${REMOTE_PHP}" artisan config:cache
+          "${REMOTE_PHP}" artisan route:cache
+          "${REMOTE_PHP}" artisan view:cache
+
+          echo "Deploy finished successfully."
+          REMOTE_SCRIPT
