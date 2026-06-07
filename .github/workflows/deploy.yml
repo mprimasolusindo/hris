@@ -22,7 +22,7 @@ env:
 
 jobs:
   deploy:
-    name: Rsync and build on server
+    name: Deploy and build on server
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -30,8 +30,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install rsync and sshpass
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq rsync sshpass
+      - name: Install sshpass
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
 
       - name: Sync application files
         env:
@@ -39,22 +39,23 @@ jobs:
         run: |
           set -euo pipefail
 
-          RSYNC_SSH="sshpass -e ssh -p ${SSH_PORT} -o StrictHostKeyChecking=accept-new"
+          SSH_CMD=(sshpass -e ssh -p "${SSH_PORT}" -o StrictHostKeyChecking=accept-new)
 
-          rsync -az --delete \
-            --exclude '.git/' \
-            --exclude '.github/' \
-            --exclude '.specstory/' \
-            --exclude 'node_modules/' \
-            --exclude 'vendor/' \
-            --exclude '.env' \
-            --exclude 'storage/' \
-            --exclude 'bootstrap/cache/' \
-            --exclude 'public/build/' \
-            --exclude 'public/hot' \
-            --exclude 'public/storage' \
-            -e "${RSYNC_SSH}" \
-            ./ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+          "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "mkdir -p '${DEPLOY_PATH}'"
+
+          tar czf - \
+            --exclude='./.git' \
+            --exclude='./.github' \
+            --exclude='./.specstory' \
+            --exclude='./node_modules' \
+            --exclude='./vendor' \
+            --exclude='./.env' \
+            --exclude='./storage' \
+            --exclude='./bootstrap/cache' \
+            --exclude='./public/build' \
+            --exclude='./public/hot' \
+            --exclude='./public/storage' \
+            . | "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "cd '${DEPLOY_PATH}' && tar xzf -"
 
       - name: Install dependencies and optimize on server
         env:
