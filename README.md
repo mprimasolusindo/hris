@@ -143,6 +143,34 @@ php artisan tinker               # REPL to query models, e.g. App\Models\Employe
 > `migrate:reset`, or `db:wipe` — `db_hris` holds hand-built test data.
 > See `.cursor/rules/05-database-safety.mdc`.
 
+## Demo data on the production server
+
+Deploy uses `composer install --no-dev`. `fakerphp/faker` is a **production**
+dependency (required by `HrisIndonesiaDemoSeeder`), so it is installed on every
+deploy.
+
+After deploy, SSH to the server and run (Plesk PHP 8.3 example):
+
+```bash
+cd /var/www/vhosts/mitraprimasolusindo.com/hris
+PHP=/opt/plesk/php/8.3/bin/php
+
+$PHP artisan migrate --force
+$PHP artisan db:seed --class=PermissionSeeder --force
+$PHP artisan db:seed --class=RoleSeeder --force
+$PHP artisan db:seed --class=HrisIndonesiaDemoSeeder --force
+$PHP artisan optimize:clear
+```
+
+Use **`HrisIndonesiaDemoSeeder`** (not `HrisIndonesiaDemoSupplementSeeder` alone).
+The main seeder creates the demo company and employees, then runs the supplement
+automatically.
+
+Login: `admin@demo.hris.local` / `password`
+
+If you see `Class "Faker\Factory" not found` before this fix is deployed, run
+once on the server: `$PHP /path/to/composer.phar require fakerphp/faker --no-interaction`
+
 ## Out of scope (Phase 1)
 
 - UI / Blade views, `resources/js`, `resources/css` — no front-end work yet.
