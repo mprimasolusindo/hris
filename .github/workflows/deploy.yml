@@ -14,7 +14,7 @@ env:
   SSH_HOST: 31.97.190.61
   SSH_PORT: "22"
   SSH_USER: hrismps
-  DEPLOY_PATH: /var/www/vhosts/mitraprimasolusindo.com/hris
+  DEPLOY_PATH: /hris
   # Override in GitHub repo Variables if Plesk uses non-default paths.
   REMOTE_PHP: php
   REMOTE_COMPOSER: composer
