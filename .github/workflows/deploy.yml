@@ -16,8 +16,10 @@ env:
   SSH_USER: hrismps
   DEPLOY_PATH: /var/www/vhosts/mitraprimasolusindo.com/hris
   # Override in GitHub repo Variables if Plesk uses non-default paths.
-  REMOTE_PHP: php
-  REMOTE_COMPOSER: composer
+  # Composer runs THROUGH this PHP binary, so it uses 8.3 (not the server default).
+  REMOTE_PHP: /opt/plesk/php/8.3/bin/php
+  # Leave blank to auto-detect composer.phar, or set the full path to it.
+  REMOTE_COMPOSER: ""
   REMOTE_NPM: npm
 
 jobs:
@@ -81,7 +83,18 @@ jobs:
             exit 1
           fi
 
-          "${REMOTE_COMPOSER}" install --no-dev --optimize-autoloader --no-interaction
+          COMPOSER_BIN="${REMOTE_COMPOSER:-}"
+          if [[ -z "${COMPOSER_BIN}" ]]; then
+            for c in /usr/lib/plesk-9.0/composer.phar /usr/local/bin/composer.phar "${HOME}/composer.phar" /usr/local/bin/composer; do
+              if [[ -f "$c" ]]; then COMPOSER_BIN="$c"; break; fi
+            done
+          fi
+          if [[ -z "${COMPOSER_BIN}" ]]; then
+            echo "ERROR: composer not found. Set REMOTE_COMPOSER to the composer.phar path on the server."
+            exit 1
+          fi
+
+          "${REMOTE_PHP}" "${COMPOSER_BIN}" install --no-dev --optimize-autoloader --no-interaction
           "${REMOTE_NPM}" ci
           "${REMOTE_NPM}" run build
 
