@@ -23,6 +23,7 @@ type PendingRow = {
     type: string;
     start_date: string;
     end_date: string;
+    reason: string | null;
     created_at: string;
 };
 
@@ -56,6 +57,7 @@ export default function Approvals({
                                     <TableHead>{t('leaveType')}</TableHead>
                                     <TableHead>{t('startDate')}</TableHead>
                                     <TableHead>{t('endDate')}</TableHead>
+                                    <TableHead>{t('reason')}</TableHead>
                                     <TableHead>{t('actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -63,7 +65,7 @@ export default function Approvals({
                                 {pending.length === 0 ? (
                                     <TableRow>
                                         <TableCell
-                                            colSpan={5}
+                                            colSpan={6}
                                             className="py-8 text-center text-muted-foreground"
                                         >
                                             {t('noData')}
@@ -81,6 +83,9 @@ export default function Approvals({
                                             <TableCell>{row.type}</TableCell>
                                             <TableCell>{row.start_date}</TableCell>
                                             <TableCell>{row.end_date}</TableCell>
+                                            <TableCell className="max-w-[14rem] text-sm text-muted-foreground">
+                                                {row.reason || '—'}
+                                            </TableCell>
                                             <TableCell>
                                                 <div className="flex gap-1">
                                                     <Button

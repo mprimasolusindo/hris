@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Leave;
 
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
 use App\Models\Leave;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class LeaveApprovalController extends Controller
                 'type' => $leave->type,
                 'start_date' => $leave->start_date?->toDateString(),
                 'end_date' => $leave->end_date?->toDateString(),
+                'reason' => $leave->reason,
                 'created_at' => $leave->created_at?->toDateTimeString(),
             ]);
 
@@ -45,7 +47,15 @@ class LeaveApprovalController extends Controller
                 ->with('success', 'Leave is no longer pending.');
         }
 
-        $leave->update(['status' => $data['decision']]);
+        $approverId = Employee::query()
+            ->where('user_id', auth()->id())
+            ->value('id');
+
+        $leave->update([
+            'status' => $data['decision'],
+            'approved_by' => $approverId,
+            'decided_at' => now(),
+        ]);
 
         return redirect()
             ->route('leave.approvals.index')

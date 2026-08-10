@@ -31,6 +31,8 @@ class PermissionCatalog
             'organization.departments' => ['View Departments', 'Create Departments', 'Update Departments', 'Delete Departments'],
             'organization.positions' => ['View Positions', 'Create Positions', 'Update Positions', 'Delete Positions'],
             'shifts' => ['View Shifts', 'Create Shifts', 'Update Shifts', 'Delete Shifts', 'Assign Shifts'],
+            'work-schedules' => ['View Work Schedules', 'Create Work Schedules', 'Update Work Schedules', 'Delete Work Schedules'],
+            'holidays' => ['View Holidays', 'Create Holidays', 'Update Holidays', 'Delete Holidays'],
             'leave' => ['View Leave', 'Create Leave', 'Update Leave', 'Cancel Leave'],
             'leave.approvals' => ['View Leave Approvals', 'Approve Leave'],
             'leave.balance' => ['View Leave Balance'],

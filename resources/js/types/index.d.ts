@@ -37,6 +37,7 @@ export type PageProps<
     };
     flash: {
         success?: string | null;
+        error?: string | null;
     };
     reminders?: ReminderSummary | null;
     bugReport: {

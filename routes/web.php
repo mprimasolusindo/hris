@@ -40,6 +40,8 @@ use App\Http\Controllers\Leave\LeaveTypeController;
 use App\Http\Controllers\Shift\ShiftAssignController;
 use App\Http\Controllers\Shift\ShiftCalendarController;
 use App\Http\Controllers\Shift\ShiftController;
+use App\Http\Controllers\WorkSchedule\HolidayController;
+use App\Http\Controllers\WorkSchedule\WorkScheduleController;
 use App\Http\Controllers\Master\AllowanceTypeController;
 use App\Http\Controllers\Organization\CompanyController;
 use App\Http\Controllers\Organization\DepartmentController;
@@ -373,6 +375,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('shifts/{shift}', [ShiftController::class, 'destroy'])
         ->middleware('can:shifts.delete')
         ->name('shifts.destroy');
+
+    Route::get('work-schedules', [WorkScheduleController::class, 'index'])
+        ->middleware('can:work-schedules.view')
+        ->name('work-schedules.index');
+    Route::post('work-schedules', [WorkScheduleController::class, 'store'])
+        ->middleware('can:work-schedules.create')
+        ->name('work-schedules.store');
+    Route::put('work-schedules/{workSchedule}', [WorkScheduleController::class, 'update'])
+        ->middleware('can:work-schedules.update')
+        ->name('work-schedules.update');
+    Route::delete('work-schedules/{workSchedule}', [WorkScheduleController::class, 'destroy'])
+        ->middleware('can:work-schedules.delete')
+        ->name('work-schedules.destroy');
+
+    Route::get('holidays', [HolidayController::class, 'index'])
+        ->middleware('can:holidays.view')
+        ->name('holidays.index');
+    Route::post('holidays', [HolidayController::class, 'store'])
+        ->middleware('can:holidays.create')
+        ->name('holidays.store');
+    Route::put('holidays/{holiday}', [HolidayController::class, 'update'])
+        ->middleware('can:holidays.update')
+        ->name('holidays.update');
+    Route::delete('holidays/{holiday}', [HolidayController::class, 'destroy'])
+        ->middleware('can:holidays.delete')
+        ->name('holidays.destroy');
 
     Route::get('leave', [LeaveController::class, 'index'])
         ->middleware('can:leave.view')

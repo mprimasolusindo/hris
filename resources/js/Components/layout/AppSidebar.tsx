@@ -122,6 +122,16 @@ export function AppSidebar() {
                         permission: 'shifts.view',
                     },
                     {
+                        title: t('workSchedules'),
+                        href: route('work-schedules.index'),
+                        permission: 'work-schedules.view',
+                    },
+                    {
+                        title: t('holidays'),
+                        href: route('holidays.index'),
+                        permission: 'holidays.view',
+                    },
+                    {
                         title: t('overtime'),
                         href: route('overtime.index'),
                         permission: 'overtime.view',

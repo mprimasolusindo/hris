@@ -3,11 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Employee;
-use App\Models\Permission;
 use App\Policies\EmployeePolicy;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -46,18 +44,14 @@ class AppServiceProvider extends ServiceProvider
                 return true;
             }
 
+            // Resolve against role permissions at check-time so tests after
+            // PermissionSeeder (and newly seeded keys) work without Gate::define at boot.
+            if ($user && method_exists($user, 'hasPermission')) {
+                return $user->hasPermission($ability);
+            }
+
             return null;
         });
-
-        if (Schema::hasTable('sys_permissions')) {
-            try {
-                Permission::query()->pluck('key')->each(function (string $key) {
-                    Gate::define($key, fn ($user) => $user->hasPermission($key));
-                });
-            } catch (\Throwable) {
-                // Migration-safe: permissions table may exist but be empty during seeding.
-            }
-        }
 
         Vite::prefetch(concurrency: 3);
     }

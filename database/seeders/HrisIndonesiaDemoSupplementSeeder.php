@@ -72,6 +72,7 @@ class HrisIndonesiaDemoSupplementSeeder extends Seeder
         $this->seedLoans($employees, $faker);
         $this->seedContracts($employees, $faker);
         $this->seedShifts($employees);
+        $this->seedWorkSchedulesAndHolidays();
         $this->seedLeaves($employees, $faker);
         $this->seedOvertimes($employees, $faker);
         $this->seedRecruitment($company, $faker);
@@ -378,6 +379,94 @@ class HrisIndonesiaDemoSupplementSeeder extends Seeder
     }
 
     /**
+     * Default weekly work-schedule templates plus sample 2026 Indonesian
+     * public holidays / cuti bersama (demo catalogue — not official gazette).
+     */
+    private function seedWorkSchedulesAndHolidays(): void
+    {
+        if (! Schema::hasTable('att_work_schedules') || ! Schema::hasTable('att_holidays')) {
+            return;
+        }
+
+        \App\Models\WorkSchedule::query()->firstOrCreate(
+            ['code' => 'STD-5D'],
+            [
+                'name' => 'Kantor 5 Hari (Sen–Jum)',
+                'is_default' => true,
+                'default_start_time' => '08:00:00',
+                'default_end_time' => '17:00:00',
+                'mon_working' => true,
+                'tue_working' => true,
+                'wed_working' => true,
+                'thu_working' => true,
+                'fri_working' => true,
+                'sat_working' => false,
+                'sun_working' => false,
+            ]
+        );
+
+        \App\Models\WorkSchedule::query()->firstOrCreate(
+            ['code' => 'STD-6D'],
+            [
+                'name' => 'Operasional 6 Hari (Sen–Sab)',
+                'is_default' => false,
+                'default_start_time' => '08:00:00',
+                'default_end_time' => '16:00:00',
+                'mon_working' => true,
+                'tue_working' => true,
+                'wed_working' => true,
+                'thu_working' => true,
+                'fri_working' => true,
+                'sat_working' => true,
+                'sun_working' => false,
+            ]
+        );
+
+        // Demo 2026 holidays — illustrative sample for UI/dev data only.
+        $holidays = [
+            ['holiday_date' => '2026-01-01', 'name' => 'Tahun Baru 2026', 'type' => 'national'],
+            ['holiday_date' => '2026-01-16', 'name' => 'Isra Miraj Nabi Muhammad SAW', 'type' => 'national'],
+            ['holiday_date' => '2026-02-17', 'name' => 'Tahun Baru Imlek 2577', 'type' => 'national'],
+            ['holiday_date' => '2026-03-19', 'name' => 'Hari Suci Nyepi (Tahun Baru Saka 1948)', 'type' => 'national'],
+            ['holiday_date' => '2026-03-21', 'name' => 'Hari Raya Idulfitri 1447 H', 'type' => 'national'],
+            ['holiday_date' => '2026-03-22', 'name' => 'Hari Raya Idulfitri 1447 H', 'type' => 'national'],
+            ['holiday_date' => '2026-03-23', 'name' => 'Cuti Bersama Idulfitri', 'type' => 'joint_leave'],
+            ['holiday_date' => '2026-03-24', 'name' => 'Cuti Bersama Idulfitri', 'type' => 'joint_leave'],
+            ['holiday_date' => '2026-04-03', 'name' => 'Wafat Yesus Kristus', 'type' => 'national'],
+            ['holiday_date' => '2026-04-05', 'name' => 'Kebangkitan Yesus Kristus (Paskah)', 'type' => 'national'],
+            ['holiday_date' => '2026-05-01', 'name' => 'Hari Buruh Internasional', 'type' => 'national'],
+            ['holiday_date' => '2026-05-14', 'name' => 'Kenaikan Yesus Kristus', 'type' => 'national'],
+            ['holiday_date' => '2026-05-27', 'name' => 'Hari Raya Waisak 2570 BE', 'type' => 'national'],
+            ['holiday_date' => '2026-05-28', 'name' => 'Hari Raya Iduladha 1447 H', 'type' => 'national'],
+            ['holiday_date' => '2026-06-01', 'name' => 'Hari Lahir Pancasila', 'type' => 'national'],
+            ['holiday_date' => '2026-06-16', 'name' => 'Tahun Baru Islam 1448 H', 'type' => 'national'],
+            ['holiday_date' => '2026-08-17', 'name' => 'Hari Kemerdekaan Republik Indonesia', 'type' => 'national'],
+            ['holiday_date' => '2026-08-25', 'name' => 'Maulid Nabi Muhammad SAW', 'type' => 'national'],
+            ['holiday_date' => '2026-12-25', 'name' => 'Hari Raya Natal', 'type' => 'national'],
+            ['holiday_date' => '2026-12-24', 'name' => 'Cuti Bersama Natal', 'type' => 'joint_leave'],
+            [
+                'holiday_date' => '2026-12-31',
+                'name' => 'Company Year-End Half Day',
+                'type' => 'company',
+                'is_half_day' => true,
+                'notes' => 'Demo company half-day — not a national holiday.',
+            ],
+        ];
+
+        foreach ($holidays as $def) {
+            \App\Models\Holiday::query()->firstOrCreate(
+                ['holiday_date' => $def['holiday_date']],
+                [
+                    'name' => $def['name'],
+                    'type' => $def['type'],
+                    'is_half_day' => $def['is_half_day'] ?? false,
+                    'notes' => $def['notes'] ?? null,
+                ]
+            );
+        }
+    }
+
+    /**
      * Three shift templates + per-employee weekday assignments for the
      * current month (rotating Pagi/Siang/Malam).
      *
@@ -509,6 +598,7 @@ class HrisIndonesiaDemoSupplementSeeder extends Seeder
             ['code' => 'paternity', 'name' => 'Cuti Ayah', 'annual_entitlement_days' => 2, 'is_paid' => true],
             ['code' => 'marriage', 'name' => 'Cuti Menikah', 'annual_entitlement_days' => 3, 'is_paid' => true],
             ['code' => 'bereavement', 'name' => 'Cuti Duka', 'annual_entitlement_days' => 2, 'is_paid' => true],
+            ['code' => 'permission', 'name' => 'Izin (Permission)', 'annual_entitlement_days' => 0, 'is_paid' => false],
             ['code' => 'other', 'name' => 'Izin Lainnya', 'annual_entitlement_days' => 0, 'is_paid' => false],
         ];
 

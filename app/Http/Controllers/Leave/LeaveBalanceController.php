@@ -15,15 +15,25 @@ class LeaveBalanceController extends Controller
     public function index(Request $request): Response
     {
         $year = (int) $request->query('year', now()->year);
+        $selfOnly = LeaveController::isSelfServiceOnly();
+        $currentEmployeeId = LeaveController::currentEmployeeId();
 
         $employees = Employee::query()
             ->where('status', 'active')
+            ->when($selfOnly, function ($q) use ($currentEmployeeId) {
+                if ($currentEmployeeId === null) {
+                    $q->whereRaw('0 = 1');
+                } else {
+                    $q->where('id', $currentEmployeeId);
+                }
+            })
             ->orderBy('full_name')
             ->get(['id', 'full_name', 'employee_code']);
 
         $approved = Leave::query()
             ->where('status', 'approved')
             ->whereYear('start_date', $year)
+            ->when($selfOnly && $currentEmployeeId !== null, fn ($q) => $q->where('employee_id', $currentEmployeeId))
             ->get();
 
         $types = LeaveType::query()->orderBy('name')->get();
@@ -81,6 +91,7 @@ class LeaveBalanceController extends Controller
             'year' => $year,
             'balances' => $balances,
             'typeOptions' => $typeCodes,
+            'selfService' => $selfOnly,
         ]);
     }
 }
