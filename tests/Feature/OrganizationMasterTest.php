@@ -25,16 +25,17 @@ class OrganizationMasterTest extends TestCase
             ->assertOk();
 
         $this->actingAs($user)
-            ->get(route('master.allowance-types.index'))
-            ->assertOk();
-
-        $this->actingAs($user)
             ->get(route('payroll.master-allowances.index'))
             ->assertOk();
 
         $this->actingAs($user)
             ->get(route('payroll.master-deductions.index'))
             ->assertOk();
+
+        // Legacy allowance-types URL redirects to the consolidated catalog.
+        $this->actingAs($user)
+            ->get(route('master.allowance-types.index'))
+            ->assertRedirect(route('payroll.master-allowances.index'));
     }
 
     public function test_company_crud_via_http(): void
@@ -72,10 +73,11 @@ class OrganizationMasterTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->post(route('master.allowance-types.store'), [
+            ->post(route('payroll.master-allowances.store'), [
                 'name' => 'Transport',
                 'is_taxable' => true,
-            ]);
+            ])
+            ->assertRedirect(route('payroll.master-allowances.index'));
 
         $this->actingAs($user)
             ->post(route('payroll.master-deductions.store'), [

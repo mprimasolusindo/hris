@@ -1,5 +1,9 @@
 import HrisLayout from '@/Layouts/HrisLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import JobPostingForm, {
+    emptyJobForm,
+    type JobFormLookups,
+} from '@/Components/recruitment/JobPostingForm';
+import { Head, Link, router } from '@inertiajs/react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -11,8 +15,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/Components/ui/dialog';
-import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
 import {
     Select,
     SelectContent,
@@ -29,14 +31,18 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
-import { FormEventHandler, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 type JobRow = {
     id: number;
     title: string;
+    code: string | null;
     status: string;
+    priority: string;
+    employment_type: string;
+    headcount: number;
     company_name: string | null;
     application_count: number;
 };
@@ -45,15 +51,15 @@ export default function Index({
     jobs,
     filters,
     summary,
-    companies,
     statusOptions,
+    formOptions,
     flash,
 }: PageProps<{
     jobs: JobRow[];
     filters: { status: string; company_id: string };
     summary: { open: number; total: number };
-    companies: Array<{ id: number; name: string }>;
     statusOptions: string[];
+    formOptions: JobFormLookups;
 }>) {
     const { t } = useLanguage();
     const [open, setOpen] = useState(false);
@@ -62,24 +68,8 @@ export default function Index({
         if (flash?.success) toast.success(flash.success);
     }, [flash?.success]);
 
-    const form = useForm({
-        company_id: String(companies[0]?.id ?? ''),
-        title: '',
-        status: 'open',
-    });
-
     const apply = (patch: Partial<typeof filters>) => {
         router.get(route('recruitment.jobs.index'), { ...filters, ...patch });
-    };
-
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-        form.post(route('recruitment.jobs.store'), {
-            onSuccess: () => {
-                setOpen(false);
-                form.reset();
-            },
-        });
     };
 
     return (
@@ -96,59 +86,19 @@ export default function Index({
                                 {t('addJob')}
                             </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
                             <DialogHeader>
                                 <DialogTitle>{t('addJob')}</DialogTitle>
                             </DialogHeader>
-                            <form onSubmit={submit} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label>{t('companies')}</Label>
-                                    <Select
-                                        value={form.data.company_id}
-                                        onValueChange={(v) => form.setData('company_id', v)}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {companies.map((c) => (
-                                                <SelectItem key={c.id} value={String(c.id)}>
-                                                    {c.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>{t('jobTitle')}</Label>
-                                    <Input
-                                        value={form.data.title}
-                                        onChange={(e) => form.setData('title', e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>{t('status')}</Label>
-                                    <Select
-                                        value={form.data.status}
-                                        onValueChange={(v) => form.setData('status', v)}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {statusOptions.map((s) => (
-                                                <SelectItem key={s} value={s}>
-                                                    {s}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <Button type="submit" disabled={form.processing}>
-                                    {t('save')}
-                                </Button>
-                            </form>
+                            <JobPostingForm
+                                formOptions={formOptions}
+                                mode="create"
+                                initial={emptyJobForm({
+                                    company_id: String(formOptions.companies[0]?.id ?? ''),
+                                })}
+                                onCancel={() => setOpen(false)}
+                                onSuccess={() => setOpen(false)}
+                            />
                         </DialogContent>
                     </Dialog>
                 </div>
@@ -199,7 +149,7 @@ export default function Index({
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">{t('all')}</SelectItem>
-                                {companies.map((c) => (
+                                {formOptions.companies.map((c) => (
                                     <SelectItem key={c.id} value={String(c.id)}>
                                         {c.name}
                                     </SelectItem>
@@ -214,9 +164,11 @@ export default function Index({
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead>{t('jobCode')}</TableHead>
                                     <TableHead>{t('jobTitle')}</TableHead>
                                     <TableHead>{t('companies')}</TableHead>
                                     <TableHead>{t('status')}</TableHead>
+                                    <TableHead>{t('priority')}</TableHead>
                                     <TableHead>{t('applications')}</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -224,7 +176,7 @@ export default function Index({
                                 {jobs.length === 0 ? (
                                     <TableRow>
                                         <TableCell
-                                            colSpan={4}
+                                            colSpan={6}
                                             className="py-8 text-center text-muted-foreground"
                                         >
                                             {t('noData')}
@@ -233,6 +185,9 @@ export default function Index({
                                 ) : (
                                     jobs.map((row) => (
                                         <TableRow key={row.id}>
+                                            <TableCell className="font-mono text-sm">
+                                                {row.code || '—'}
+                                            </TableCell>
                                             <TableCell>
                                                 <Link
                                                     href={route(
@@ -248,6 +203,7 @@ export default function Index({
                                             <TableCell>
                                                 <Badge variant="outline">{row.status}</Badge>
                                             </TableCell>
+                                            <TableCell>{row.priority}</TableCell>
                                             <TableCell>{row.application_count}</TableCell>
                                         </TableRow>
                                     ))

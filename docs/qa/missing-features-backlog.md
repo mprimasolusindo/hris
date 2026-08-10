@@ -266,10 +266,10 @@
 ### P2-006 — Remove duplicate allowance nav
 
 - **Module:** payroll / UX
-- **Status:** partial
-- **Evidence:** `master/allowance-types` duplicates `payroll/master-allowances`
+- **Status:** done
+- **Evidence:** Consolidated to `payroll/master-allowances` (Master Tunjangan). Removed duplicate sidebar entry and `AllowanceTypeController`; GET `/master/allowance-types` redirects to master allowances.
 - **Acceptance criteria:**
-  - [ ] Consolidate to one nav entry or distinct purpose documented
+  - [x] Consolidate to one nav entry or distinct purpose documented
 
 ---
 

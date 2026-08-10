@@ -1,18 +1,13 @@
 import HrisLayout from '@/Layouts/HrisLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import JobPostingForm, {
+    emptyJobForm,
+    type JobFormLookups,
+} from '@/Components/recruitment/JobPostingForm';
+import { Head, Link, router } from '@inertiajs/react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/Components/ui/select';
 import {
     Table,
     TableBody,
@@ -22,16 +17,34 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
-import { FormEventHandler, useEffect } from 'react';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { useEffect } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 type JobData = {
     id: number;
     title: string;
+    code: string | null;
     status: string;
     company_id: number;
     company_name: string | null;
+    site_id: number | null;
+    department_id: number | null;
+    position_id: number | null;
+    employment_type: string;
+    headcount: number;
+    priority: string;
+    opened_at: string | null;
+    target_close_date: string | null;
+    hiring_manager_id: number | null;
+    recruiter_id: number | null;
+    salary_min: string | null;
+    salary_max: string | null;
+    currency: string;
+    description: string | null;
+    requirements: string | null;
+    benefits: string | null;
+    location_note: string | null;
     created_at: string | null;
 };
 
@@ -46,13 +59,12 @@ type ApplicationRow = {
 export default function Show({
     job,
     applications,
-    companies,
-    statusOptions,
+    formOptions,
     flash,
 }: PageProps<{
     job: JobData;
     applications: ApplicationRow[];
-    companies: Array<{ id: number; name: string }>;
+    formOptions: JobFormLookups;
     statusOptions: string[];
 }>) {
     const { t } = useLanguage();
@@ -60,17 +72,6 @@ export default function Show({
     useEffect(() => {
         if (flash?.success) toast.success(flash.success);
     }, [flash?.success]);
-
-    const form = useForm({
-        company_id: String(job.company_id),
-        title: job.title,
-        status: job.status,
-    });
-
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-        form.put(route('recruitment.jobs.update', job.id));
-    };
 
     const destroy = () => {
         if (!window.confirm(t('delete') + '?')) return;
@@ -90,7 +91,10 @@ export default function Show({
                     </Button>
                     <div>
                         <h1 className="text-2xl font-bold text-foreground">{job.title}</h1>
-                        <p className="text-sm text-muted-foreground">{job.company_name}</p>
+                        <p className="text-sm text-muted-foreground">
+                            {job.company_name}
+                            {job.code ? ` · ${job.code}` : ''}
+                        </p>
                     </div>
                     <Badge className="ml-auto" variant="outline">
                         {job.status}
@@ -102,61 +106,44 @@ export default function Show({
                         <CardTitle>{t('editJob')}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={submit} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>{t('companies')}</Label>
-                                <Select
-                                    value={form.data.company_id}
-                                    onValueChange={(v) => form.setData('company_id', v)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {companies.map((c) => (
-                                            <SelectItem key={c.id} value={String(c.id)}>
-                                                {c.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label>{t('jobTitle')}</Label>
-                                <Input
-                                    value={form.data.title}
-                                    onChange={(e) => form.setData('title', e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>{t('status')}</Label>
-                                <Select
-                                    value={form.data.status}
-                                    onValueChange={(v) => form.setData('status', v)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {statusOptions.map((s) => (
-                                            <SelectItem key={s} value={s}>
-                                                {s}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="flex justify-between gap-2">
-                                <Button type="button" variant="destructive" onClick={destroy}>
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    {t('delete')}
-                                </Button>
-                                <Button type="submit" disabled={form.processing}>
-                                    {t('save')}
-                                </Button>
-                            </div>
-                        </form>
+                        <JobPostingForm
+                            formOptions={formOptions}
+                            mode="edit"
+                            jobId={job.id}
+                            showDelete
+                            onDelete={destroy}
+                            initial={emptyJobForm({
+                                company_id: String(job.company_id),
+                                site_id: job.site_id ? String(job.site_id) : '',
+                                department_id: job.department_id
+                                    ? String(job.department_id)
+                                    : '',
+                                position_id: job.position_id
+                                    ? String(job.position_id)
+                                    : '',
+                                title: job.title,
+                                code: job.code ?? '',
+                                employment_type: job.employment_type || 'permanent',
+                                headcount: String(job.headcount ?? 1),
+                                priority: job.priority || 'medium',
+                                opened_at: job.opened_at ?? '',
+                                target_close_date: job.target_close_date ?? '',
+                                hiring_manager_id: job.hiring_manager_id
+                                    ? String(job.hiring_manager_id)
+                                    : '',
+                                recruiter_id: job.recruiter_id
+                                    ? String(job.recruiter_id)
+                                    : '',
+                                salary_min: job.salary_min ?? '',
+                                salary_max: job.salary_max ?? '',
+                                currency: job.currency || 'IDR',
+                                description: job.description ?? '',
+                                requirements: job.requirements ?? '',
+                                benefits: job.benefits ?? '',
+                                location_note: job.location_note ?? '',
+                                status: job.status,
+                            })}
+                        />
                     </CardContent>
                 </Card>
 

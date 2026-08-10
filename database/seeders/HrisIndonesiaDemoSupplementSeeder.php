@@ -673,7 +673,15 @@ class HrisIndonesiaDemoSupplementSeeder extends Seeder
             $jobRows[] = [
                 'company_id' => $company->id,
                 'title' => $title,
-                'status' => $faker->randomElement(['open', 'open', 'on_hold', 'closed']),
+                'code' => sprintf('REQ-DEMO-%03d', $i + 1),
+                'employment_type' => $faker->randomElement(['permanent', 'contract', 'outsourced', 'internship']),
+                'headcount' => $faker->numberBetween(1, 5),
+                'filled_count' => 0,
+                'status' => $faker->randomElement(['open', 'open', 'on_hold', 'closed', 'draft']),
+                'priority' => $faker->randomElement(['low', 'medium', 'high']),
+                'currency' => 'IDR',
+                'location_note' => $faker->randomElement([null, 'On-site Jakarta', 'Hybrid', 'Remote']),
+                'description' => 'Demo job posting for '.$title,
                 'created_at' => $now,
                 'updated_at' => $now,
             ];

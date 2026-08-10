@@ -42,7 +42,6 @@ use App\Http\Controllers\Shift\ShiftCalendarController;
 use App\Http\Controllers\Shift\ShiftController;
 use App\Http\Controllers\WorkSchedule\HolidayController;
 use App\Http\Controllers\WorkSchedule\WorkScheduleController;
-use App\Http\Controllers\Master\AllowanceTypeController;
 use App\Http\Controllers\Organization\CompanyController;
 use App\Http\Controllers\Organization\DepartmentController;
 use App\Http\Controllers\Organization\PositionController;
@@ -634,18 +633,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('can:talent.nine-box.delete')
         ->name('succession.nine-box.destroy');
 
-    Route::get('master/allowance-types', [AllowanceTypeController::class, 'index'])
-        ->middleware('can:master.allowance-types.view')
+    // Backward-compatible redirect for the removed "Allowance Types" menu.
+    // Single catalog: Payroll → Master Allowances.
+    Route::get('master/allowance-types', function () {
+        return redirect()->route('payroll.master-allowances.index');
+    })
+        ->middleware('can:payroll.master-allowances.view')
         ->name('master.allowance-types.index');
-    Route::post('master/allowance-types', [AllowanceTypeController::class, 'store'])
-        ->middleware('can:master.allowance-types.create')
-        ->name('master.allowance-types.store');
-    Route::put('master/allowance-types/{salaryComponent}', [AllowanceTypeController::class, 'update'])
-        ->middleware('can:master.allowance-types.update')
-        ->name('master.allowance-types.update');
-    Route::delete('master/allowance-types/{salaryComponent}', [AllowanceTypeController::class, 'destroy'])
-        ->middleware('can:master.allowance-types.delete')
-        ->name('master.allowance-types.destroy');
 
     Route::get('bug-reports', [BugReportController::class, 'index'])
         ->middleware('can:bug-reports.view')

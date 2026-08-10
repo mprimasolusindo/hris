@@ -175,11 +175,6 @@ export function AppSidebar() {
                         permission: 'payroll.view',
                     },
                     {
-                        title: t('allowanceTypes'),
-                        href: route('master.allowance-types.index'),
-                        permission: 'master.allowance-types.view',
-                    },
-                    {
                         title: t('masterAllowances'),
                         href: route('payroll.master-allowances.index'),
                         permission: 'payroll.master-allowances.view',

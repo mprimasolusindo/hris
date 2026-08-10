@@ -52,7 +52,6 @@ class PermissionCatalog
             'talent.talent-pool' => ['View Talent Pool', 'Create Talent Pool', 'Update Talent Pool', 'Delete Talent Pool'],
             'talent.succession' => ['View Succession', 'Create Succession', 'Update Succession', 'Delete Succession'],
             'talent.nine-box' => ['View Nine Box', 'Create Nine Box', 'Update Nine Box', 'Delete Nine Box'],
-            'master.allowance-types' => ['View Allowance Types', 'Create Allowance Types', 'Update Allowance Types', 'Delete Allowance Types'],
             'search' => ['View Search'],
             'saas.tenants' => ['View Tenants', 'Create Tenants', 'Update Tenants', 'Delete Tenants'],
             'saas.plans' => ['View Plans', 'Create Plans', 'Update Plans', 'Delete Plans'],

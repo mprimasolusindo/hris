@@ -39,12 +39,23 @@ class RecruitmentTalentTest extends TestCase
             ->post(route('recruitment.jobs.store'), [
                 'company_id' => $company->id,
                 'title' => 'Software Engineer',
-                'status' => 'open',
+                'code' => 'REQ-SE-001',
+                'employment_type' => 'permanent',
+                'priority' => 'high',
+                'headcount' => 2,
+                'status' => 'draft',
+                'publish' => true,
+                'description' => 'Build HRIS features',
+                'requirements' => 'PHP, Laravel',
             ])
             ->assertRedirect();
 
         $job = JobPosting::query()->where('title', 'Software Engineer')->first();
         $this->assertNotNull($job);
+        $this->assertSame('open', $job->status);
+        $this->assertSame('REQ-SE-001', $job->code);
+        $this->assertSame('high', $job->priority);
+        $this->assertNotNull($job->opened_at);
 
         $this->actingAs($user)
             ->post(route('recruitment.candidates.store'), [
@@ -101,7 +112,11 @@ class RecruitmentTalentTest extends TestCase
         $job = JobPosting::query()->create([
             'company_id' => $company->id,
             'title' => 'HR Admin',
+            'code' => 'REQ-HR-001',
+            'employment_type' => 'permanent',
+            'priority' => 'medium',
             'status' => 'open',
+            'headcount' => 1,
         ]);
 
         $this->actingAs($user)
@@ -112,12 +127,22 @@ class RecruitmentTalentTest extends TestCase
             ->put(route('recruitment.jobs.update', $job), [
                 'company_id' => $company->id,
                 'title' => 'HR Specialist',
+                'code' => 'REQ-HR-001',
+                'employment_type' => 'contract',
+                'priority' => 'high',
                 'status' => 'on_hold',
+                'headcount' => 1,
+                'location_note' => 'Hybrid Jakarta',
+                'salary_min' => 8000000,
+                'salary_max' => 12000000,
+                'currency' => 'IDR',
             ])
             ->assertRedirect(route('recruitment.jobs.show', $job));
 
         $job->refresh();
         $this->assertSame('HR Specialist', $job->title);
+        $this->assertSame('contract', $job->employment_type);
+        $this->assertSame('Hybrid Jakarta', $job->location_note);
 
         $candidate = Candidate::query()->create([
             'name' => 'Ani Wijaya',
