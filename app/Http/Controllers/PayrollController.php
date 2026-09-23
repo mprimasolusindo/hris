@@ -45,15 +45,23 @@ class PayrollController extends Controller
             return $this->exportCsv($query->get());
         }
 
-        $payrolls = $query->latest()->paginate(20)->withQueryString();
+        $summaryStats = (clone $query)
+            ->selectRaw("
+                SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as draft,
+                SUM(CASE WHEN status IN ('generated', 'reviewed', 'approved') THEN 1 ELSE 0 END) as generated,
+                SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) as paid,
+                COALESCE(SUM(net_salary), 0) as total_amount
+            ")
+            ->first();
 
-        $collection = $payrolls->getCollection();
         $summary = [
-            'draft' => $collection->where('status', 'draft')->count(),
-            'generated' => $collection->whereIn('status', ['generated', 'reviewed', 'approved'])->count(),
-            'paid' => $collection->where('status', 'paid')->count(),
-            'total_amount' => (float) $collection->sum('net_salary'),
+            'draft' => (int) $summaryStats->draft,
+            'generated' => (int) $summaryStats->generated,
+            'paid' => (int) $summaryStats->paid,
+            'total_amount' => (float) $summaryStats->total_amount,
         ];
+
+        $payrolls = $query->latest()->paginate(20)->withQueryString();
 
         $payrolls->getCollection()->transform(function (Payroll $payroll) {
             return [

@@ -190,6 +190,22 @@ export default function Index({
                                 applyFilters({ year: e.target.value })
                             }
                         />
+                        <Select
+                            value={String(filters.status ?? 'all')}
+                            onValueChange={(v) => applyFilters({ status: v })}
+                        >
+                            <SelectTrigger className="w-40">
+                                <SelectValue placeholder={t('status')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">{t('all')}</SelectItem>
+                                <SelectItem value="draft">Draft</SelectItem>
+                                <SelectItem value="generated">Generated</SelectItem>
+                                <SelectItem value="reviewed">Reviewed</SelectItem>
+                                <SelectItem value="approved">Approved</SelectItem>
+                                <SelectItem value="paid">Paid</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </CardContent>
                 </Card>
 
