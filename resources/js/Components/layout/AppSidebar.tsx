@@ -75,13 +75,11 @@ function aggregateBadge(node: NavParent): number {
 
 /** Compare Inertia pathname with Ziggy hrefs that may be absolute URLs. */
 function normalizePath(href: string): string {
-    let path = href;
-    if (/^https?:\/\//i.test(href)) {
-        try {
-            path = new URL(href).pathname;
-        } catch {
-            path = href;
-        }
+    let path: string;
+    try {
+        path = new URL(href, 'http://local').pathname;
+    } catch {
+        path = href.split(/[?#]/, 1)[0];
     }
     if (!path.startsWith('/')) {
         path = `/${path}`;

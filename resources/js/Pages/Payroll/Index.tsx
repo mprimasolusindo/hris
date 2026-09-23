@@ -215,55 +215,75 @@ export default function Index({
                     <CardContent>
                         <form
                             onSubmit={submitGenerate}
-                            className="flex flex-wrap gap-4"
+                            className="space-y-3"
                         >
-                            <Select
-                                value={generateForm.data.employee_id}
-                                onValueChange={(v) =>
-                                    generateForm.setData('employee_id', v)
-                                }
-                            >
-                                <SelectTrigger className="w-56">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {employees.map((e) => (
-                                        <SelectItem
-                                            key={e.id}
-                                            value={String(e.id)}
-                                        >
-                                            {e.employee_code} — {e.full_name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <Input
-                                type="number"
-                                min={1}
-                                max={12}
-                                className="w-24"
-                                value={generateForm.data.period_month}
-                                onChange={(e) =>
-                                    generateForm.setData(
-                                        'period_month',
-                                        Number(e.target.value),
-                                    )
-                                }
-                            />
-                            <Input
-                                type="number"
-                                className="w-28"
-                                value={generateForm.data.period_year}
-                                onChange={(e) =>
-                                    generateForm.setData(
-                                        'period_year',
-                                        Number(e.target.value),
-                                    )
-                                }
-                            />
-                            <Button type="submit" disabled={generateForm.processing}>
-                                Generate
-                            </Button>
+                            <div className="flex flex-wrap gap-4">
+                                <Select
+                                    value={generateForm.data.employee_id}
+                                    onValueChange={(v) =>
+                                        generateForm.setData('employee_id', v)
+                                    }
+                                >
+                                    <SelectTrigger className="w-56">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {employees.map((e) => (
+                                            <SelectItem
+                                                key={e.id}
+                                                value={String(e.id)}
+                                            >
+                                                {e.employee_code} — {e.full_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Input
+                                    type="number"
+                                    min={1}
+                                    max={12}
+                                    className="w-24"
+                                    value={generateForm.data.period_month}
+                                    onChange={(e) =>
+                                        generateForm.setData(
+                                            'period_month',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                />
+                                <Input
+                                    type="number"
+                                    className="w-28"
+                                    value={generateForm.data.period_year}
+                                    onChange={(e) =>
+                                        generateForm.setData(
+                                            'period_year',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                />
+                                <Button
+                                    type="submit"
+                                    disabled={generateForm.processing}
+                                >
+                                    Generate
+                                </Button>
+                            </div>
+                            {generateForm.errors.employee_id && (
+                                <p className="text-sm text-destructive">
+                                    {generateForm.errors.employee_id}
+                                </p>
+                            )}
+                            {Object.entries(generateForm.errors)
+                                .filter(([key]) => key !== 'employee_id')
+                                .map(([key, message]) => (
+                                    <p
+                                        key={key}
+                                        className="text-sm text-destructive"
+                                    >
+                                        {message}
+                                    </p>
+                                ))}
                         </form>
                     </CardContent>
                 </Card>
