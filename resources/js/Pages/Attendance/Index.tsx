@@ -90,6 +90,11 @@ export default function Index({
 
     const submitCapture: FormEventHandler = (e) => {
         e.preventDefault();
+        captureForm.transform((data) => ({
+            ...data,
+            site_id: data.site_id || null,
+            clock_out: data.clock_out || null,
+        }));
         captureForm.post(route('attendance.store'));
     };
 
@@ -239,7 +244,7 @@ export default function Index({
                                 </Select>
                             </div>
                             <div className="space-y-2">
-                                <Label>Clock in</Label>
+                                <Label>{t('clockIn')}</Label>
                                 <Input
                                     type="datetime-local"
                                     value={captureForm.data.clock_in}
@@ -250,6 +255,19 @@ export default function Index({
                                         )
                                     }
                                     required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>{t('clockOut')}</Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={captureForm.data.clock_out}
+                                    onChange={(e) =>
+                                        captureForm.setData(
+                                            'clock_out',
+                                            e.target.value,
+                                        )
+                                    }
                                 />
                             </div>
                             <div className="space-y-2">
