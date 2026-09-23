@@ -11,7 +11,6 @@ use App\Models\EmployeeJob;
 use App\Models\EmployeeSite;
 use App\Models\EmploymentContract;
 use App\Models\JobPosting;
-use App\Models\Position;
 use App\Models\Site;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -134,34 +133,28 @@ class PipelineController extends Controller
                 'salary_base' => $salaryBase,
             ]);
 
-            // Employment-history row using the hiring company's first
-            // department / position when available.
-            $department = Department::query()
-                ->where('company_id', $job->company_id)
-                ->orderBy('id')
-                ->first();
-            $position = Position::query()->orderBy('id')->first();
+            $departmentId = $job->department_id
+                ?? Department::query()->where('company_id', $job->company_id)->orderBy('id')->value('id');
+
+            $positionId = $job->position_id;
 
             EmployeeJob::query()->create([
                 'employee_id' => $employee->id,
                 'company_id' => $job->company_id,
-                'department_id' => $department?->id,
-                'position_id' => $position?->id,
+                'department_id' => $departmentId,
+                'position_id' => $positionId,
                 'employment_type' => 'pkwtt',
                 'start_date' => $joinDate->toDateString(),
                 'end_date' => null,
             ]);
 
-            // Assign to the company's first site when one exists.
-            $site = Site::query()
-                ->where('company_id', $job->company_id)
-                ->orderBy('id')
-                ->first();
+            $siteId = $job->site_id
+                ?? Site::query()->where('company_id', $job->company_id)->orderBy('id')->value('id');
 
-            if ($site !== null) {
+            if ($siteId !== null) {
                 EmployeeSite::query()->create([
                     'employee_id' => $employee->id,
-                    'site_id' => $site->id,
+                    'site_id' => $siteId,
                     'start_date' => $joinDate->toDateString(),
                     'end_date' => null,
                 ]);

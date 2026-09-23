@@ -5,8 +5,12 @@ namespace Tests\Feature;
 use App\Models\Application;
 use App\Models\Candidate;
 use App\Models\Company;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\EmployeeJob;
 use App\Models\JobPosting;
+use App\Models\Position;
+use App\Models\Site;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -166,5 +170,79 @@ class RecruitmentTalentTest extends TestCase
             ->assertRedirect(route('recruitment.jobs.index'));
 
         $this->assertSoftDeleted('trx_jobs', ['id' => $job->id]);
+    }
+
+    public function test_hire_copies_job_posting_department_position_and_site(): void
+    {
+        $user = User::factory()->create();
+        $company = Company::factory()->create(['type' => 'main']);
+
+        $firstDepartment = Department::factory()->create([
+            'company_id' => $company->id,
+            'name' => 'First Department',
+        ]);
+        $jobDepartment = Department::factory()->create([
+            'company_id' => $company->id,
+            'name' => 'Job Department',
+        ]);
+
+        $firstPosition = Position::factory()->create(['name' => 'First Position']);
+        $jobPosition = Position::factory()->create(['name' => 'Job Position']);
+
+        $firstSite = Site::factory()->create([
+            'company_id' => $company->id,
+            'name' => 'First Site',
+        ]);
+        $jobSite = Site::factory()->create([
+            'company_id' => $company->id,
+            'name' => 'Job Site',
+        ]);
+
+        $job = JobPosting::query()->create([
+            'company_id' => $company->id,
+            'department_id' => $jobDepartment->id,
+            'position_id' => $jobPosition->id,
+            'site_id' => $jobSite->id,
+            'title' => 'Target Role',
+            'code' => 'REQ-TARGET-001',
+            'employment_type' => 'permanent',
+            'priority' => 'medium',
+            'status' => 'open',
+            'headcount' => 1,
+        ]);
+
+        $candidate = Candidate::query()->create([
+            'name' => 'Hire Org Test',
+            'email' => 'hire-org@example.com',
+        ]);
+
+        $application = Application::query()->create([
+            'candidate_id' => $candidate->id,
+            'job_id' => $job->id,
+            'stage' => 'offer',
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('recruitment.applications.hire', $application))
+            ->assertRedirect();
+
+        $employee = Employee::query()->where('email', 'hire-org@example.com')->first();
+        $this->assertNotNull($employee);
+
+        $employeeJob = EmployeeJob::query()->where('employee_id', $employee->id)->first();
+        $this->assertNotNull($employeeJob);
+        $this->assertSame($jobDepartment->id, $employeeJob->department_id);
+        $this->assertSame($jobPosition->id, $employeeJob->position_id);
+        $this->assertNotSame($firstDepartment->id, $employeeJob->department_id);
+        $this->assertNotSame($firstPosition->id, $employeeJob->position_id);
+
+        $this->assertDatabaseHas('rel_employee_sites', [
+            'employee_id' => $employee->id,
+            'site_id' => $jobSite->id,
+        ]);
+        $this->assertDatabaseMissing('rel_employee_sites', [
+            'employee_id' => $employee->id,
+            'site_id' => $firstSite->id,
+        ]);
     }
 }
