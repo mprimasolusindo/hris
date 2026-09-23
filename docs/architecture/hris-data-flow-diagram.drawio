@@ -1,0 +1,311 @@
+<mxfile host="app.diagrams.net" modified="2026-08-25T13:05:00.000Z" agent="Antigravity HRIS Architecture" etag="hris-dfd-v1" version="21.6.8" type="device">
+  <!-- Page 1: Level 0 Context Diagram -->
+  <diagram id="page-l0" name="Level 0 - Context Diagram">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" background="#f8fafc" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Header Banner -->
+        <mxCell id="hdr0" value="HRIS SaaS — Level 0 Context Diagram (System Boundary &amp; External Entities)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="300" y="30" width="1000" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Central System Process -->
+        <mxCell id="sys_core" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;0.0&lt;br&gt;Indonesian HRIS&lt;br&gt;SaaS Platform&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px; color: #e0f2fe;&quot;&gt;(Laravel 12 + MySQL + Inertia React)&lt;/span&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=3;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="675" y="425" width="250" height="250" as="geometry" />
+        </mxCell>
+
+        <!-- External Entities -->
+        <!-- 1. Employee -->
+        <mxCell id="ent_emp" value="&lt;b&gt;👤 Employee / Staff&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#cbd5e1&quot; style=&quot;font-size: 11px;&quot;&gt;Internal Team Members&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;arcSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="240" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- 2. HR Admin -->
+        <mxCell id="ent_hr" value="&lt;b&gt;👔 HR Administrator&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#cbd5e1&quot; style=&quot;font-size: 11px;&quot;&gt;People Ops &amp; Payroll Officers&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;arcSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="470" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- 3. Dept Manager -->
+        <mxCell id="ent_mgr" value="&lt;b&gt;👥 Department Manager&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#cbd5e1&quot; style=&quot;font-size: 11px;&quot;&gt;Supervisors &amp; Approvers&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;arcSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="700" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- 4. Job Candidate -->
+        <mxCell id="ent_cand" value="&lt;b&gt;💼 Job Candidate&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#cbd5e1&quot; style=&quot;font-size: 11px;&quot;&gt;External Applicants&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;arcSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="240" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- 5. Outsourcing Vendor -->
+        <mxCell id="ent_vend" value="&lt;b&gt;🏢 Outsourcing Vendor&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#cbd5e1&quot; style=&quot;font-size: 11px;&quot;&gt;Labor Suppliers &amp; Contractors&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;arcSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="470" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- 6. Statutory / Tax Authorities -->
+        <mxCell id="ent_gov" value="&lt;b&gt;🏛️ Statutory &amp; Tax Authorities&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#cbd5e1&quot; style=&quot;font-size: 11px;&quot;&gt;DJP (PPh 21) &amp; BPJS Kesehatan/TK&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;arcSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="700" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- 7. SaaS Super Admin -->
+        <mxCell id="ent_saas" value="&lt;b&gt;⚙️ SaaS Platform Super Admin&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#cbd5e1&quot; style=&quot;font-size: 11px;&quot;&gt;Tenant &amp; Billing Master Admin&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#475569;strokeColor=#64748b;strokeWidth=2;fontColor=#ffffff;arcSize=12;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="690" y="140" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Connectors & Data Flows -->
+        <!-- Employee to System -->
+        <mxCell id="flow_e1" value="GPS Attendance, Leave &amp; Overtime requests, Profile/Doc edits" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;entryX=0;entryY=0.25;strokeColor=#0284c7;strokeWidth=2;fontSize=11;fontColor=#0369a1;" edge="1" parent="1" source="ent_emp" target="sys_core">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow_e2" value="Payslips, Leave Balances, Shift Schedule &amp; Approval Alerts" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.4;entryX=1;entryY=0.75;strokeColor=#059669;strokeWidth=2;fontSize=11;fontColor=#047857;" edge="1" parent="1" source="sys_core" target="ent_emp">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- HR Admin to System -->
+        <mxCell id="flow_hr1" value="Employee Master, PKWT Contracts, Shift Schedules, Salary Config" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3;entryX=0;entryY=0.5;strokeColor=#0284c7;strokeWidth=2;fontSize=11;fontColor=#0369a1;" edge="1" parent="1" source="ent_hr" target="sys_core">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow_hr2" value="Payroll Summary, Tax Reports, Compliance Alerts &amp; Headcount Analytics" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.6;entryX=1;entryY=0.8;strokeColor=#059669;strokeWidth=2;fontSize=11;fontColor=#047857;" edge="1" parent="1" source="sys_core" target="ent_hr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Dept Manager to System -->
+        <mxCell id="flow_mgr1" value="Leave/OT Approvals, 9-Box Talent Ratings, Performance Reviews" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3;entryX=0;entryY=0.75;strokeColor=#0284c7;strokeWidth=2;fontSize=11;fontColor=#0369a1;" edge="1" parent="1" source="ent_mgr" target="sys_core">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow_mgr2" value="Team Attendance Dashboard, Shift Roster, Succession Pool Data" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.85;entryX=1;entryY=0.85;strokeColor=#059669;strokeWidth=2;fontSize=11;fontColor=#047857;" edge="1" parent="1" source="sys_core" target="ent_mgr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Candidate to System -->
+        <mxCell id="flow_c1" value="Job Applications, Resume details, Stage Confirmations" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.3;entryX=1;entryY=0.25;strokeColor=#0284c7;strokeWidth=2;fontSize=11;fontColor=#0369a1;" edge="1" parent="1" source="ent_cand" target="sys_core">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow_c2" value="Interview Invitations &amp; Application Status Updates" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.4;entryX=0;entryY=0.75;strokeColor=#059669;strokeWidth=2;fontSize=11;fontColor=#047857;" edge="1" parent="1" source="sys_core" target="ent_cand">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Vendor to System -->
+        <mxCell id="flow_v1" value="Outsourced Worker Roster, Invoices &amp; Compliance Proof" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.3;entryX=1;entryY=0.5;strokeColor=#0284c7;strokeWidth=2;fontSize=11;fontColor=#0369a1;" edge="1" parent="1" source="ent_vend" target="sys_core">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow_v2" value="Placement Tracking, Validated Timesheets, Invoice Payment Status" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.6;entryX=0;entryY=0.8;strokeColor=#059669;strokeWidth=2;fontSize=11;fontColor=#047857;" edge="1" parent="1" source="sys_core" target="ent_vend">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- System to Authorities -->
+        <mxCell id="flow_gov1" value="PPh 21 TER Monthly Withholding (PMK 168/2023), BPJS 6-Program Files" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;entryX=0;entryY=0.5;strokeColor=#059669;strokeWidth=2;fontSize=11;fontColor=#047857;" edge="1" parent="1" source="sys_core" target="ent_gov">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SaaS Admin Flows -->
+        <mxCell id="flow_saas1" value="Tenant Provisioning &amp; Subscription Plans" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#0284c7;strokeWidth=2;fontSize=11;fontColor=#0369a1;" edge="1" parent="1" source="ent_saas" target="sys_core">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- Page 2: Level 1 System Data Flow Diagram -->
+  <diagram id="page-l1" name="Level 1 - Core HRIS DFD">
+    <mxGraphModel dx="1800" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1400" background="#f8fafc" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Header -->
+        <mxCell id="hdr1" value="HRIS SaaS — Level 1 Core System Data Flow Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="500" y="20" width="1000" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Process Subsystems (Column 2) -->
+        <mxCell id="p1" value="&lt;b&gt;1.0 Auth, RBAC &amp; Tenant Control&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;Users, Roles, Permissions, Multi-Tenancy&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="100" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p2" value="&lt;b&gt;2.0 Organization &amp; Master Setup&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;Companies, Sites, Depts, Positions&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="210" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p3" value="&lt;b&gt;3.0 Employee Master &amp; Lifecycle&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;Identities, Jobs, PKWT/PKWTT, Tax/Bank Profiles&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="320" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p4" value="&lt;b&gt;4.0 Time, Attendance &amp; Overtime Engine&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;GPS Clock-in/out, Shifts, Overtime (PP 35/2021)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="430" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p5" value="&lt;b&gt;5.0 Leave Entitlement &amp; Approvals&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;Leave Balance, Type Config, Manager Decisions&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="540" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p6" value="&lt;b&gt;6.0 Indonesian Payroll &amp; Tax Engine&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;PPh21 TER (PMK 168/2023), BPJS 6-types, Payslips&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0369a1;strokeColor=#075985;strokeWidth=3;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="650" width="320" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p7" value="&lt;b&gt;7.0 Recruitment &amp; ATS Pipeline&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;Job Postings, Candidates, Interviews, 1-Click Hire&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="770" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p8" value="&lt;b&gt;8.0 Talent, 9-Box &amp; Succession&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;Performance Reviews, 9-Box Grid, Training Programs&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="880" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p9" value="&lt;b&gt;9.0 Outsourcing &amp; Labor Compliance&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;Vendor Placements, Compliance Checks, Invoicing&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="990" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p10" value="&lt;b&gt;10.0 SaaS Subscriptions &amp; System Health&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#e0f2fe&quot; style=&quot;font-size: 11px;&quot;&gt;Plans, Payments, Bug Report Diagnostics&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;arcSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="1100" width="320" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- External Entities (Column 1) -->
+        <mxCell id="ent1" value="&lt;b&gt;👤 Employee&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="80" y="380" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ent2" value="&lt;b&gt;👔 HR Administrator&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="80" y="240" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ent3" value="&lt;b&gt;👥 Dept Manager&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="80" y="520" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ent4" value="&lt;b&gt;💼 Candidate&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="80" y="775" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ent5" value="&lt;b&gt;🏢 Outsourcing Vendor&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="80" y="995" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ent6" value="&lt;b&gt;⚙️ SaaS Admin&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="80" y="105" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Data Stores (Column 3) -->
+        <mxCell id="ds1" value="&lt;b&gt;D1: System &amp; Security&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#ccfbf1&quot; style=&quot;font-size: 11px;&quot;&gt;sys_tenants, users, roles, permissions&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="100" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ds2" value="&lt;b&gt;D2: Organization Master&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#ccfbf1&quot; style=&quot;font-size: 11px;&quot;&gt;org_companies, org_sites, org_departments, org_positions&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="210" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ds3" value="&lt;b&gt;D3: Employee Master &amp; Benefits&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#ccfbf1&quot; style=&quot;font-size: 11px;&quot;&gt;emp_employees, identities, jobs, contracts, allowances, loans, tax_profiles&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="320" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ds4" value="&lt;b&gt;D4: Attendance &amp; Shifts&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#ccfbf1&quot; style=&quot;font-size: 11px;&quot;&gt;att_attendances, att_shifts, rel_employee_shifts, ot_overtimes, cfg_schedules&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="430" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ds5" value="&lt;b&gt;D5: Leave Data&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#ccfbf1&quot; style=&quot;font-size: 11px;&quot;&gt;lv_leaves, lv_leave_types&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="540" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ds6" value="&lt;b&gt;D6: Payroll &amp; Indonesian Tax/BPJS&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#ccfbf1&quot; style=&quot;font-size: 11px;&quot;&gt;cfg_salary_components, cfg_bpjs, cfg_tax_rules, pay_payrolls, pay_payroll_items&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="650" width="340" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ds7" value="&lt;b&gt;D7: Recruitment &amp; ATS&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#ccfbf1&quot; style=&quot;font-size: 11px;&quot;&gt;trx_jobs, trx_candidates, trx_applications, trx_interviews&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="770" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ds8" value="&lt;b&gt;D8: Talent &amp; Performance&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#ccfbf1&quot; style=&quot;font-size: 11px;&quot;&gt;perf_reviews, nine_box_assessments, talent_pools, succession_plans, trainings&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="880" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ds9" value="&lt;b&gt;D9: Outsourcing &amp; Billing&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#ccfbf1&quot; style=&quot;font-size: 11px;&quot;&gt;rel_vendor_employees, outsourcing_compliance_records, bill_vendor_invoices&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="990" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Process-DataStore Connections -->
+        <mxCell id="p_ds_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="p1" target="ds1" />
+        <mxCell id="p_ds_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="p2" target="ds2" />
+        <mxCell id="p_ds_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="p3" target="ds3" />
+        <mxCell id="p_ds_4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="p4" target="ds4" />
+        <mxCell id="p_ds_5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="p5" target="ds5" />
+        <mxCell id="p_ds_6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="p6" target="ds6" />
+        <mxCell id="p_ds_7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="p7" target="ds7" />
+        <mxCell id="p_ds_8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="p8" target="ds8" />
+        <mxCell id="p_ds_9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="p9" target="ds9" />
+
+        <!-- Cross-subsystem Payroll data feeder lines -->
+        <mxCell id="feed_emp" value="Base Salary, Fixed Allowances, Deductions" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.2;exitY=1;entryX=0.8;entryY=0;strokeColor=#d97706;strokeWidth=1.5;fontSize=10;fontColor=#b45309;" edge="1" parent="1" source="ds3" target="p6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1168" y="620" />
+              <mxPoint x="776" y="620" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="feed_att" value="Payable days &amp; Overtime Hours" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.3;exitY=1;entryX=0.6;entryY=0;strokeColor=#d97706;strokeWidth=1.5;fontSize=10;fontColor=#b45309;" edge="1" parent="1" source="ds4" target="p6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1202" y="635" />
+              <mxPoint x="712" y="635" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Recruitment to Employee Master (Hiring pipeline) -->
+        <mxCell id="hire_pipe" value="Hired Candidate Provisioning" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;strokeColor=#059669;strokeWidth=2;fontSize=10;fontColor=#047857;" edge="1" parent="1" source="p7" target="p3" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- Page 3: Level 2 Indonesian Payroll & Tax Engine -->
+  <diagram id="page-l2-payroll" name="Level 2 - Indonesian Payroll Flow">
+    <mxGraphModel dx="1600" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1200" background="#f8fafc" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="pay_title" value="DFD 2.1 — Indonesian Payroll &amp; Statutory Calculation Engine (PMK 168/2023 TER &amp; BPJS)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="350" y="25" width="1000" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Triggers / Inputs -->
+        <mxCell id="step1_box" value="&lt;b&gt;1. Employee Data Aggregation&lt;/b&gt;&lt;br&gt;• Base Salary from &lt;i&gt;emp_contracts&lt;/i&gt;&lt;br&gt;• PTKP Status (TK/0 - K/3) &amp; NPWP from &lt;i&gt;emp_tax_profiles&lt;/i&gt;&lt;br&gt;• Allowances (Fixed/Variable) from &lt;i&gt;emp_allowances&lt;/i&gt;&lt;br&gt;• Deductions &amp; Active Loans from &lt;i&gt;emp_deductions / loans&lt;/i&gt;&lt;br&gt;• Overtime Hours &amp; Unpaid Leaves from &lt;i&gt;ot_overtimes / lv_leaves&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#334155;strokeWidth=2;fontColor=#ffffff;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="380" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- Gross Calculation -->
+        <mxCell id="step2_box" value="&lt;b&gt;2. Gross Taxable Income Calculation&lt;/b&gt;&lt;br&gt;&lt;b&gt;Gross Pay&lt;/b&gt; = Base Salary + Fixed Allowances + Variable Allowances + Overtime Pay + Taxable Benefits" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0284c7;strokeColor=#0369a1;strokeWidth=2;fontColor=#ffffff;align=center;" vertex="1" parent="1">
+          <mxGeometry x="540" y="130" width="380" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- BPJS Calculation Block -->
+        <mxCell id="step3_bpjs" value="&lt;b&gt;3. BPJS 6-Program Statutory Engine (cfg_bpjs)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;table style=&quot;width:100%; font-size:11px; color:#ffffff;&quot;&gt;&lt;tr&gt;&lt;td&gt;• BPJS Kesehatan:&lt;/td&gt;&lt;td&gt;4% Employer, 1% Employee (Max Cap Rp 12M)&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;• BPJS TK JHT:&lt;/td&gt;&lt;td&gt;3.7% Employer, 2% Employee&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;• BPJS TK JP:&lt;/td&gt;&lt;td&gt;2% Employer, 1% Employee (Annual Cap indexed)&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;• BPJS TK JKK:&lt;/td&gt;&lt;td&gt;0.24% - 1.74% Employer (Risk Group based)&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;• BPJS TK JKM:&lt;/td&gt;&lt;td&gt;0.3% Employer&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;• BPJS TK JKP:&lt;/td&gt;&lt;td&gt;Government Funded (UU Cipta Kerja)&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0369a1;strokeColor=#075985;strokeWidth=2;fontColor=#ffffff;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="90" width="460" height="170" as="geometry" />
+        </mxCell>
+
+        <!-- PPh 21 TER Engine -->
+        <mxCell id="step4_tax" value="&lt;b&gt;4. PPh 21 TER Calculation Engine (PMK 168/2023)&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. &lt;b&gt;Determine Category&lt;/b&gt;:&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;• &lt;b&gt;TER A&lt;/b&gt;: TK/0, TK/1, K/0&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;• &lt;b&gt;TER B&lt;/b&gt;: TK/2, TK/3, K/1, K/2&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;• &lt;b&gt;TER C&lt;/b&gt;: K/3&lt;br&gt;2. &lt;b&gt;Bracket Lookup&lt;/b&gt; in &lt;i&gt;cfg_tax_rules&lt;/i&gt; using Gross Taxable Base (Gross + Employer BPJS Kes/JKK/JKM)&lt;br&gt;3. &lt;b&gt;Tax Withholding&lt;/b&gt; = Gross Base × Effective Monthly Rate (%)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7c2d12;strokeColor=#9a3412;strokeWidth=2;fontColor=#ffffff;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="540" y="340" width="460" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- Take-Home Pay Result -->
+        <mxCell id="step5_net" value="&lt;b&gt;5. Net Take-Home Pay (THP) Calculation&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px; color:#a7f3d0;&quot;&gt;THP = Gross Salary - (Employee BPJS 4% + PPh 21 TER + Loans + Deductions)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#065f46;strokeColor=#047857;strokeWidth=2;fontColor=#ffffff;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="380" width="460" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Data Storage & Payslips -->
+        <mxCell id="step6_store" value="&lt;b&gt;6. Finalization &amp; Storage&lt;/b&gt;&lt;br&gt;• Insert Batch to &lt;i&gt;pay_payrolls&lt;/i&gt;&lt;br&gt;• Insert Itemized Lines to &lt;i&gt;pay_payroll_items&lt;/i&gt;&lt;br&gt;• Generate Digital PDF Payslips&lt;br&gt;• Export Bank Transfer File (BCA/Mandiri/BRI format)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#0f766e;strokeColor=#115e59;strokeWidth=2;fontColor=#ffffff;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="720" y="600" width="440" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- Flow Connectors -->
+        <mxCell id="pflow1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0284c7;strokeWidth=2;" edge="1" parent="1" source="step1_box" target="step2_box" />
+        <mxCell id="pflow2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0284c7;strokeWidth=2;" edge="1" parent="1" source="step2_box" target="step3_bpjs" />
+        <mxCell id="pflow3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#0284c7;strokeWidth=2;" edge="1" parent="1" source="step2_box" target="step4_tax" />
+        <mxCell id="pflow4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#0284c7;strokeWidth=2;" edge="1" parent="1" source="step4_tax" target="step5_net" />
+        <mxCell id="pflow5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#047857;strokeWidth=2;" edge="1" parent="1" source="step3_bpjs" target="step5_net" />
+        <mxCell id="pflow6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#0f766e;strokeWidth=2;" edge="1" parent="1" source="step5_net" target="step6_store" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
