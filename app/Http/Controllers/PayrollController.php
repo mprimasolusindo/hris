@@ -100,17 +100,41 @@ class PayrollController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'employee_id' => ['required', 'exists:emp_employees,id'],
+            'scope' => ['nullable', 'in:all'],
+            'employee_id' => ['required_without:scope', 'nullable', 'exists:emp_employees,id'],
             'period_month' => ['required', 'integer', 'between:1,12'],
             'period_year' => ['required', 'integer', 'min:2000', 'max:2100'],
         ]);
 
+        $month = (int) $data['period_month'];
+        $year = (int) $data['period_year'];
+
+        if (($data['scope'] ?? null) === 'all') {
+            $generated = 0;
+            $skipped = 0;
+
+            $employees = Employee::query()
+                ->where('status', 'active')
+                ->orderBy('id')
+                ->get();
+
+            foreach ($employees as $employee) {
+                $baseSalary = $this->service->resolveBaseSalaryForPeriod($employee, $month, $year);
+                if ($baseSalary === null) {
+                    $skipped++;
+                    continue;
+                }
+                $this->service->generate($employee, $month, $year, $baseSalary);
+                $generated++;
+            }
+
+            return redirect()
+                ->route('payroll.index')
+                ->with('success', "Generated {$generated} payroll(s). Skipped {$skipped} (no active contract).");
+        }
+
         $employee = Employee::query()->findOrFail($data['employee_id']);
-        $baseSalary = $this->service->resolveBaseSalaryForPeriod(
-            $employee,
-            (int) $data['period_month'],
-            (int) $data['period_year'],
-        );
+        $baseSalary = $this->service->resolveBaseSalaryForPeriod($employee, $month, $year);
 
         if ($baseSalary === null) {
             throw ValidationException::withMessages([
@@ -118,12 +142,7 @@ class PayrollController extends Controller
             ]);
         }
 
-        $payroll = $this->service->generate(
-            $employee,
-            (int) $data['period_month'],
-            (int) $data['period_year'],
-            $baseSalary
-        );
+        $payroll = $this->service->generate($employee, $month, $year, $baseSalary);
 
         return redirect()
             ->route('payroll.show', $payroll)
