@@ -67,7 +67,6 @@ export default function Index({
         employee_id: String(employees[0]?.id ?? ''),
         period_month: Number(filters.month === 'all' ? new Date().getMonth() + 1 : filters.month),
         period_year: Number(filters.year),
-        base_salary: '',
     });
 
     const bulkForm = useForm({
@@ -261,19 +260,6 @@ export default function Index({
                                         Number(e.target.value),
                                     )
                                 }
-                            />
-                            <Input
-                                type="number"
-                                placeholder="Base salary"
-                                className="w-40"
-                                value={generateForm.data.base_salary}
-                                onChange={(e) =>
-                                    generateForm.setData(
-                                        'base_salary',
-                                        e.target.value,
-                                    )
-                                }
-                                required
                             />
                             <Button type="submit" disabled={generateForm.processing}>
                                 Generate

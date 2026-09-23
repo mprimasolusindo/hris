@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Employee;
+use App\Models\EmploymentContract;
 use App\Models\Leave;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,12 +50,19 @@ class HardeningTest extends TestCase
         $user = User::factory()->create();
         $employee = Employee::factory()->create();
 
+        EmploymentContract::query()->create([
+            'employee_id' => $employee->id,
+            'contract_type' => 'pkwtt',
+            'start_date' => now()->startOfYear(),
+            'end_date' => null,
+            'salary_base' => 5000000,
+        ]);
+
         $this->actingAs($user)
             ->post(route('payroll.store'), [
                 'employee_id' => $employee->id,
                 'period_month' => now()->month,
                 'period_year' => now()->year,
-                'base_salary' => 5000000,
             ]);
 
         $payroll = \App\Models\Payroll::query()->first();

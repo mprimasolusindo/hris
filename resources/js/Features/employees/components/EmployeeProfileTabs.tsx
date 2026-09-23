@@ -890,6 +890,7 @@ export function EmployeeProfileTabs({
                                             <TableHead>Type</TableHead>
                                             <TableHead>Start</TableHead>
                                             <TableHead>End</TableHead>
+                                            <TableHead>Base salary</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -898,6 +899,7 @@ export function EmployeeProfileTabs({
                                                 <TableCell>{c.contract_type}</TableCell>
                                                 <TableCell>{c.start_date}</TableCell>
                                                 <TableCell>{c.end_date ?? '—'}</TableCell>
+                                                <TableCell>{formatIdr(c.salary_base)}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>

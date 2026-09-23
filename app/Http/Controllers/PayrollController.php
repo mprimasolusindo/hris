@@ -10,6 +10,7 @@ use App\Services\Payroll\PayrollCalculationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -102,15 +103,26 @@ class PayrollController extends Controller
             'employee_id' => ['required', 'exists:emp_employees,id'],
             'period_month' => ['required', 'integer', 'between:1,12'],
             'period_year' => ['required', 'integer', 'min:2000', 'max:2100'],
-            'base_salary' => ['required', 'numeric', 'min:0'],
         ]);
 
         $employee = Employee::query()->findOrFail($data['employee_id']);
+        $baseSalary = $this->service->resolveBaseSalaryForPeriod(
+            $employee,
+            (int) $data['period_month'],
+            (int) $data['period_year'],
+        );
+
+        if ($baseSalary === null) {
+            throw ValidationException::withMessages([
+                'employee_id' => 'No active employment contract with base salary found for this payroll period.',
+            ]);
+        }
+
         $payroll = $this->service->generate(
             $employee,
             (int) $data['period_month'],
             (int) $data['period_year'],
-            (float) $data['base_salary']
+            $baseSalary
         );
 
         return redirect()

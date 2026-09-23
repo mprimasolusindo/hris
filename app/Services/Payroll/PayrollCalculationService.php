@@ -5,6 +5,7 @@ namespace App\Services\Payroll;
 use App\Models\Attendance;
 use App\Models\BpjsConfig;
 use App\Models\Employee;
+use App\Models\EmploymentContract;
 use App\Models\Payroll;
 use App\Models\TaxRule;
 use App\Support\Payroll\TerCategoryResolver;
@@ -31,6 +32,32 @@ class PayrollCalculationService
     private const ATTENDANCE_DAILY_ALLOWANCE = 25000;
 
     private const NO_NPWP_SURCHARGE = 1.20;
+
+    /**
+     * Base salary from the employment contract active on the payroll period end.
+     */
+    public function resolveBaseSalaryForPeriod(Employee $employee, int $month, int $year): ?float
+    {
+        $periodEnd = Carbon::create($year, $month, 1)->endOfMonth();
+
+        $contract = EmploymentContract::query()
+            ->where('employee_id', $employee->id)
+            ->whereDate('start_date', '<=', $periodEnd)
+            ->where(function ($query) use ($periodEnd) {
+                $query->whereNull('end_date')
+                    ->orWhereDate('end_date', '>=', $periodEnd);
+            })
+            ->orderByDesc('start_date')
+            ->first();
+
+        if ($contract === null) {
+            return null;
+        }
+
+        $salary = (float) $contract->salary_base;
+
+        return $salary > 0 ? $salary : null;
+    }
 
     /**
      * Generate (or regenerate) a payroll for one employee and period and

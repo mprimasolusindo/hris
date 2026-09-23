@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Attendance;
 use App\Models\BpjsConfig;
+use App\Models\EmploymentContract;
 use App\Models\Payroll;
 use App\Models\TaxRule;
 use App\Models\User;
@@ -143,6 +144,14 @@ class PhaseOneFlowTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        EmploymentContract::query()->create([
+            'employee_id' => $employeeId,
+            'contract_type' => 'pkwtt',
+            'start_date' => now()->startOfYear(),
+            'end_date' => null,
+            'salary_base' => 10000000,
+        ]);
+
         Attendance::query()->create([
             'employee_id' => $employeeId,
             'site_id' => null,
@@ -158,7 +167,6 @@ class PhaseOneFlowTest extends TestCase
             'employee_id' => $employeeId,
             'period_month' => $month,
             'period_year' => $year,
-            'base_salary' => 10000000,
         ]);
 
         $payroll = Payroll::query()->firstOrFail();
