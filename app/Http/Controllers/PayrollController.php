@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Overtime;
 use App\Models\Payroll;
 use App\Models\Site;
 use App\Services\Payroll\PayrollCalculationService;
@@ -146,14 +147,12 @@ class PayrollController extends Controller
         $attendanceSummary = [
             'days' => $attendanceSource->whereIn('status', ['present', 'late'])->count(),
             'leave_days' => $attendanceSource->whereIn('status', ['leave', 'sick'])->count(),
-            'overtime_hours' => $attendanceSource->sum(function ($row) {
-                if (! $row->clock_in || ! $row->clock_out) {
-                    return 0;
-                }
-                $hours = $row->clock_in->diffInMinutes($row->clock_out) / 60;
-
-                return max(0, min(4, $hours - 8));
-            }),
+            'overtime_hours' => round((float) Overtime::query()
+                ->where('employee_id', $payroll->employee_id)
+                ->where('status', 'approved')
+                ->whereYear('date', $payroll->period_year)
+                ->whereMonth('date', $payroll->period_month)
+                ->sum('hours'), 1),
         ];
 
         return Inertia::render('Payroll/Show', [
