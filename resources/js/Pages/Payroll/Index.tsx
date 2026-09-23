@@ -40,6 +40,13 @@ type PayrollRow = {
     status: string;
 };
 
+type PaginatedPayrolls = {
+    data: PayrollRow[];
+    links: Array<{ url: string | null; label: string; active: boolean }>;
+    current_page: number;
+    last_page: number;
+};
+
 export default function Index({
     payrolls,
     filters,
@@ -49,7 +56,7 @@ export default function Index({
     sites,
     flash,
 }: PageProps<{
-    payrolls: { data: PayrollRow[] };
+    payrolls: PaginatedPayrolls;
     filters: Record<string, string | number>;
     summary: Record<string, number>;
     employees: Array<{ id: number; full_name: string; employee_code: string }>;
@@ -129,6 +136,25 @@ export default function Index({
             checked ? [...prev, id] : prev.filter((x) => x !== id),
         );
     };
+
+    const pageIds = payrolls.data.map((row) => row.id);
+    const allPageSelected =
+        pageIds.length > 0 && pageIds.every((id) => selected.includes(id));
+    const somePageSelected = pageIds.some((id) => selected.includes(id));
+
+    const toggleAllOnPage = (checked: boolean) => {
+        setSelected((prev) => {
+            if (checked) {
+                const merged = new Set([...prev, ...pageIds]);
+                return Array.from(merged);
+            }
+            return prev.filter((id) => !pageIds.includes(id));
+        });
+    };
+
+    useEffect(() => {
+        setSelected([]);
+    }, [payrolls.current_page, pageIds.join(',')]);
 
     const formatMoney = (v: string) =>
         new Intl.NumberFormat('id-ID', {
@@ -338,7 +364,22 @@ export default function Index({
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead />
+                                    <TableHead className="w-10">
+                                        <Checkbox
+                                            aria-label="Select all on this page"
+                                            checked={
+                                                allPageSelected
+                                                    ? true
+                                                    : somePageSelected
+                                                      ? 'indeterminate'
+                                                      : false
+                                            }
+                                            onCheckedChange={(c) =>
+                                                toggleAllOnPage(!!c)
+                                            }
+                                            disabled={pageIds.length === 0}
+                                        />
+                                    </TableHead>
                                     <TableHead>ID</TableHead>
                                     <TableHead>{t('employees')}</TableHead>
                                     <TableHead>Period</TableHead>
@@ -392,6 +433,29 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+
+                {payrolls.last_page > 1 && (
+                    <div className="flex flex-wrap gap-2">
+                        {payrolls.links.map((link, i) =>
+                            link.url ? (
+                                <Button
+                                    key={i}
+                                    variant={link.active ? 'default' : 'outline'}
+                                    size="sm"
+                                    asChild
+                                >
+                                    <Link href={link.url} preserveScroll>
+                                        <span
+                                            dangerouslySetInnerHTML={{
+                                                __html: link.label,
+                                            }}
+                                        />
+                                    </Link>
+                                </Button>
+                            ) : null,
+                        )}
+                    </div>
+                )}
             </div>
         </HrisLayout>
     );
