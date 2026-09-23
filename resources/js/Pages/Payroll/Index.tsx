@@ -87,6 +87,24 @@ export default function Index({
 
     const submitGenerate: FormEventHandler = (e) => {
         e.preventDefault();
+        if (generateForm.data.employee_id === 'all') {
+            if (
+                !window.confirm(
+                    `Generate payroll for all employees for ${generateForm.data.period_month}/${generateForm.data.period_year}?`,
+                )
+            ) {
+                return;
+            }
+            generateForm.transform((data) => ({
+                scope: 'all',
+                period_month: data.period_month,
+                period_year: data.period_year,
+            }));
+            generateForm.post(route('payroll.store'), {
+                onFinish: () => generateForm.transform((data) => data),
+            });
+            return;
+        }
         generateForm.post(route('payroll.store'));
     };
 
@@ -228,6 +246,9 @@ export default function Index({
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="all">
+                                            All employees
+                                        </SelectItem>
                                         {employees.map((e) => (
                                             <SelectItem
                                                 key={e.id}
