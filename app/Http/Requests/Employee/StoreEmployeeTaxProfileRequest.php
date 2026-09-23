@@ -16,7 +16,6 @@ class StoreEmployeeTaxProfileRequest extends FormRequest
     {
         return [
             'has_npwp' => ['boolean'],
-            'npwp' => IdValidators::npwpRules(),
             'tax_status' => IdValidators::taxStatusRules(),
             'tax_method' => IdValidators::taxMethodRules(),
             'dependents_count' => ['integer', 'min:0', 'max:3'],

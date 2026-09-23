@@ -117,6 +117,36 @@ class EmployeeSubResourceTest extends TestCase
         $response->assertSessionHasErrors('nik');
     }
 
+    public function test_tax_profile_npwp_is_sourced_from_identity(): void
+    {
+        $user = User::factory()->create();
+        $employee = $this->seedCompanyAndEmployee();
+
+        \DB::table('emp_identities')->insert([
+            'employee_id' => $employee->id,
+            'nik' => '3201010101010001',
+            'npwp' => '12.345.678.9-012.345',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->post(route('employees.tax-profile.store', $employee), [
+            'has_npwp' => true,
+            'npwp' => '99.999.999.9-999.999',
+            'tax_status' => 'TK/0',
+            'tax_method' => 'ter_monthly',
+            'dependents_count' => 0,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('emp_tax_profiles', [
+            'employee_id' => $employee->id,
+            'npwp' => '12.345.678.9-012.345',
+            'has_npwp' => true,
+            'tax_status' => 'TK/0',
+        ]);
+    }
+
     public function test_allowance_can_be_created(): void
     {
         $user = User::factory()->create();

@@ -23,6 +23,10 @@ class EmployeeTaxProfileService
 
     public function upsertForEmployee(Employee $employee, array $data): EmployeeTaxProfile
     {
+        unset($data['npwp']);
+        $employee->loadMissing('identity');
+        $data['npwp'] = $employee->identity?->npwp;
+
         $profile = $employee->taxProfile;
 
         if ($profile) {

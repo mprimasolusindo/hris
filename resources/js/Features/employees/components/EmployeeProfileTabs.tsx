@@ -151,8 +151,7 @@ export function EmployeeProfileTabs({
     });
 
     const taxForm = useForm({
-        has_npwp: employee.tax_profile?.has_npwp ?? false,
-        npwp: employee.tax_profile?.npwp ?? '',
+        has_npwp: employee.tax_profile?.has_npwp ?? !!employee.identity?.npwp,
         tax_status: employee.tax_profile?.tax_status ?? '',
         tax_method: employee.tax_profile?.tax_method ?? 'ter_monthly',
         dependents_count: employee.tax_profile?.dependents_count ?? 0,
@@ -956,7 +955,7 @@ export function EmployeeProfileTabs({
                     {employee.tax_profile && (
                         <Card>
                             <CardContent className="grid gap-4 p-6 sm:grid-cols-3">
-                                <Field label="NPWP" value={employee.tax_profile.npwp} />
+                                <Field label="NPWP" value={employee.identity?.npwp} />
                                 <Field label="PTKP" value={employee.tax_profile.tax_status} />
                                 <Field label="Tax method" value={employee.tax_profile.tax_method} />
                             </CardContent>
@@ -1237,7 +1236,12 @@ export function EmployeeProfileTabs({
                         </div>
                         <div className="space-y-2">
                             <Label>NPWP</Label>
-                            <Input value={taxForm.data.npwp} onChange={(e) => taxForm.setData('npwp', e.target.value)} />
+                            <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm">
+                                {employee.identity?.npwp ?? 'Set in ID / NPWP'}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                                NPWP is managed on the employee identity (ID / NPWP) section.
+                            </p>
                         </div>
                         <div className="space-y-2">
                             <Label>PTKP (tax_status)</Label>
