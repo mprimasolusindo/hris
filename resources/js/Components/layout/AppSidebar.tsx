@@ -73,6 +73,23 @@ function aggregateBadge(node: NavParent): number {
     return node.children.reduce((sum, child) => sum + (child.badge ?? 0), 0);
 }
 
+/** Compare Inertia pathname with Ziggy hrefs that may be absolute URLs. */
+function normalizePath(href: string): string {
+    let path = href;
+    if (/^https?:\/\//i.test(href)) {
+        try {
+            path = new URL(href).pathname;
+        } catch {
+            path = href;
+        }
+    }
+    if (!path.startsWith('/')) {
+        path = `/${path}`;
+    }
+    const trimmed = path.replace(/\/+$/, '');
+    return trimmed === '' ? '/' : trimmed;
+}
+
 export function AppSidebar() {
     const { state } = useSidebar();
     const collapsed = state === 'collapsed';
@@ -395,8 +412,15 @@ export function AppSidebar() {
         [adminNav, can],
     );
 
-    const isActive = (path: string) =>
-        url === path || url.startsWith(path + '/');
+    const currentPath = useMemo(() => normalizePath(url), [url]);
+
+    const isActive = (path: string) => {
+        const normalized = normalizePath(path);
+        return (
+            currentPath === normalized ||
+            currentPath.startsWith(`${normalized}/`)
+        );
+    };
 
     const hasActiveChild = (node: NavParent) =>
         node.children.some((child) => isActive(child.href));
@@ -456,13 +480,18 @@ export function AppSidebar() {
     const renderParent = (node: NavParent) => {
         const activeChild = hasActiveChild(node);
         const badgeCount = aggregateBadge(node);
-        const isOpen = expanded.has(node.title);
+        const isOpen = expanded.has(node.title) || activeChild;
 
         return (
             <Collapsible
                 key={node.title}
                 open={isOpen}
-                onOpenChange={(open) => toggleExpanded(node.title, open)}
+                onOpenChange={(open) => {
+                    if (!open && activeChild) {
+                        return;
+                    }
+                    toggleExpanded(node.title, open);
+                }}
                 className="group/collapsible"
             >
                 <SidebarMenuItem>
