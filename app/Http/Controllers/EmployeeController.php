@@ -33,11 +33,16 @@ class EmployeeController extends Controller
     {
         $this->authorize('viewAny', Employee::class);
 
-        $employees = $this->queryService->paginate($request);
         $perPage = ListPaginator::resolvePerPage($request);
 
+        // Keep LengthAwarePaginator shape for Inertia (data/links[]/current_page/last_page).
+        // Resource::collection() would emit API shape {data,links:{first..},meta} and crash TablePagination.
+        $employees = $this->queryService->paginate($request)->through(
+            fn (Employee $employee) => (new EmployeeSummaryResource($employee))->resolve(),
+        );
+
         return Inertia::render('Employees/Index', [
-            'employees' => EmployeeSummaryResource::collection($employees),
+            'employees' => $employees,
             'filters' => [
                 'search' => (string) $request->query('search', ''),
                 'status' => (string) $request->query('status', ''),
