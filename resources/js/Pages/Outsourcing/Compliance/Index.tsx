@@ -345,6 +345,9 @@ export default function Index({
                             router.get(route('outsourcing.compliance.index'), {
                                 ...filters,
                                 per_page: v,
+                                open_page: 1,
+                                resolved_page: 1,
+                                page: 1,
                             })
                         }
                     />

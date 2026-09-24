@@ -347,6 +347,9 @@ export default function Index({
                             router.get(route('vendor-billing.index'), {
                                 ...filters,
                                 per_page: v,
+                                lines_page: 1,
+                                invoices_page: 1,
+                                page: 1,
                             })
                         }
                     />
