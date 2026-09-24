@@ -19,6 +19,13 @@ class ListPaginatorTest extends TestCase
         $this->assertSame(20, ListPaginator::resolvePerPage(Request::create('/', 'GET', ['per_page' => '999'])));
     }
 
+    public function test_resolve_per_page_rejects_values_with_trailing_characters(): void
+    {
+        $this->assertSame(20, ListPaginator::resolvePerPage(
+            Request::create('/', 'GET', ['per_page' => '10foo']),
+        ));
+    }
+
     public function test_paginate_limits_results(): void
     {
         User::factory()->count(25)->create();

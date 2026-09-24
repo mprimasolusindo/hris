@@ -15,16 +15,23 @@ final class ListPaginator
     public static function resolvePerPage(Request $request, int $default = 20): int|string
     {
         $raw = $request->query('per_page', (string) $default);
-        if (! is_scalar($raw)) {
-            return $default;
-        }
-        $value = (string) $raw;
-        if ($value === 'all') {
+        if ($raw === 'all') {
             return 'all';
         }
-        $n = (int) $value;
 
-        return in_array($n, self::OPTIONS, true) ? $n : $default;
+        if (is_int($raw) && in_array($raw, self::OPTIONS, true)) {
+            return $raw;
+        }
+
+        if (is_string($raw)) {
+            foreach (self::OPTIONS as $option) {
+                if ($raw === (string) $option) {
+                    return $option;
+                }
+            }
+        }
+
+        return $default;
     }
 
     public static function paginate(

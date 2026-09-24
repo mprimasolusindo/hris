@@ -85,6 +85,8 @@ export default function Index({
         router.get(route('overtime.index'), {
             status: next.status || undefined,
             employee_id: next.employee_id || undefined,
+            per_page: next.per_page,
+            page: 1,
         });
     };
 

@@ -93,6 +93,8 @@ export default function Index({
         router.get(route('outsourcing.compliance.index'), {
             ...filters,
             ...patch,
+            open_page: 1,
+            resolved_page: 1,
         });
     };
 

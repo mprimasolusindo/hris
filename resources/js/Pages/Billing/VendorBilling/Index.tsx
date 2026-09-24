@@ -112,7 +112,12 @@ export default function Index({
     });
 
     const apply = (patch: Partial<typeof filters>) => {
-        router.get(route('vendor-billing.index'), { ...filters, ...patch });
+        router.get(route('vendor-billing.index'), {
+            ...filters,
+            ...patch,
+            lines_page: 1,
+            invoices_page: 1,
+        });
     };
 
     const openGenerate = (line?: BillingLine) => {
