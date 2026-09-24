@@ -67,7 +67,13 @@ export default function Index({
 }: PageProps<{
     flags: Paginated<FlagRow>;
     resolved: Paginated<ResolvedRow>;
-    filters: { vendor_id: string; severity: string; per_page: string };
+    filters: {
+        vendor_id: string;
+        severity: string;
+        per_page: string;
+        open_page: number;
+        resolved_page: number;
+    };
     vendors: Array<{ id: number; name: string }>;
     summary: {
         total: number;
@@ -336,7 +342,10 @@ export default function Index({
                     <PerPageSelect
                         value={filters.per_page}
                         onChange={(v) =>
-                            router.get(route('outsourcing.compliance.index'), { ...filters, per_page: v, page: 1 })
+                            router.get(route('outsourcing.compliance.index'), {
+                                ...filters,
+                                per_page: v,
+                            })
                         }
                     />
                     <TablePagination paginator={resolved} />

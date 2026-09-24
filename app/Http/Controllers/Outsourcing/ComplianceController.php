@@ -75,33 +75,35 @@ class ComplianceController extends Controller
             ->when($severity !== '', fn ($c) => $c->where('severity', $severity))
             ->values();
 
-        $resolved = OutsourcingComplianceRecord::query()
-            ->where('status', 'resolved')
-            ->with(['employee:id,full_name,employee_code', 'vendor:id,name', 'resolver:id,name'])
-            ->latest('resolved_at')
-            ->limit(50)
-            ->get()
-            ->map(fn (OutsourcingComplianceRecord $r) => [
-                'id' => $r->id,
-                'type' => $r->flag_type,
-                'vendor_name' => $r->vendor?->name,
-                'employee_name' => $r->employee?->full_name,
-                'employee_code' => $r->employee?->employee_code,
-                'detail' => $r->description,
-                'resolved_by' => $r->resolver?->name,
-                'resolved_at' => $r->resolved_at?->toDateTimeString(),
-            ]);
+        $perPage = ListPaginator::resolvePerPage($request);
+        $resolved = ListPaginator::paginate(
+            OutsourcingComplianceRecord::query()
+                ->where('status', 'resolved')
+                ->with(['employee:id,full_name,employee_code', 'vendor:id,name', 'resolver:id,name'])
+                ->latest('resolved_at'),
+            $request,
+            20,
+            'resolved_page',
+        );
+        $resolved->getCollection()->transform(fn (OutsourcingComplianceRecord $r) => [
+            'id' => $r->id,
+            'type' => $r->flag_type,
+            'vendor_name' => $r->vendor?->name,
+            'employee_name' => $r->employee?->full_name,
+            'employee_code' => $r->employee?->employee_code,
+            'detail' => $r->description,
+            'resolved_by' => $r->resolver?->name,
+            'resolved_at' => $r->resolved_at?->toDateTimeString(),
+        ]);
 
         $summary = [
             'total' => $openFlags->count(),
             'high' => $openFlags->where('severity', 'high')->count(),
             'medium' => $openFlags->where('severity', 'medium')->count(),
             'low' => $openFlags->where('severity', 'low')->count(),
-            'resolved' => $resolved->count(),
+            'resolved' => $resolved->total(),
         ];
-        $perPage = ListPaginator::resolvePerPage($request);
-        $openFlags = ListPaginator::paginateCollection($openFlags, $request);
-        $resolved = ListPaginator::paginateCollection($resolved, $request);
+        $openFlags = ListPaginator::paginateCollection($openFlags, $request, 20, 'open_page');
 
         return Inertia::render('Outsourcing/Compliance/Index', [
             'flags' => $openFlags,
@@ -110,6 +112,8 @@ class ComplianceController extends Controller
                 'vendor_id' => $vendorId,
                 'severity' => $severity,
                 'per_page' => (string) $perPage,
+                'open_page' => $request->integer('open_page', 1),
+                'resolved_page' => $request->integer('resolved_page', 1),
             ],
             'vendors' => Company::query()->where('type', 'vendor')->orderBy('name')->get(['id', 'name']),
             'summary' => $summary,

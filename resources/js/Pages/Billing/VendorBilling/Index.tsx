@@ -81,7 +81,13 @@ export default function Index({
 }: PageProps<{
     lines: Paginated<BillingLine>;
     invoices: Paginated<Invoice>;
-    filters: { month: number; year: number; per_page: string };
+    filters: {
+        month: number;
+        year: number;
+        per_page: string;
+        lines_page: number;
+        invoices_page: number;
+    };
     period_label: string;
     vendors: Array<{ id: number; name: string }>;
 }>) {
@@ -338,7 +344,10 @@ export default function Index({
                     <PerPageSelect
                         value={filters.per_page}
                         onChange={(v) =>
-                            router.get(route('vendor-billing.index'), { ...filters, per_page: v, page: 1 })
+                            router.get(route('vendor-billing.index'), {
+                                ...filters,
+                                per_page: v,
+                            })
                         }
                     />
                     <TablePagination paginator={invoices} />

@@ -68,10 +68,12 @@ class VendorBillingController extends Controller
         })->values()->sortBy('vendor_name')->values();
 
         $perPage = ListPaginator::resolvePerPage($request);
-        $lines = ListPaginator::paginateCollection($lines, $request);
+        $lines = ListPaginator::paginateCollection($lines, $request, 20, 'lines_page');
         $invoices = ListPaginator::paginate(
             VendorInvoice::query()->with('vendor:id,name')->latest(),
             $request,
+            20,
+            'invoices_page',
         );
         $invoices->getCollection()->transform(fn (VendorInvoice $invoice) => [
             'id' => $invoice->id,
@@ -88,7 +90,13 @@ class VendorBillingController extends Controller
         return Inertia::render('Billing/VendorBilling/Index', [
             'lines' => $lines,
             'invoices' => $invoices,
-            'filters' => ['month' => $month, 'year' => $year, 'per_page' => (string) $perPage],
+            'filters' => [
+                'month' => $month,
+                'year' => $year,
+                'per_page' => (string) $perPage,
+                'lines_page' => $request->integer('lines_page', 1),
+                'invoices_page' => $request->integer('invoices_page', 1),
+            ],
             'period_label' => $periodStart->format('F Y'),
             'vendors' => Company::query()->where('type', 'vendor')->orderBy('name')->get(['id', 'name']),
         ]);

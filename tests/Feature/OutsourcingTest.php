@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Company;
 use App\Models\Employee;
 use App\Models\EmploymentContract;
+use App\Models\OutsourcingComplianceRecord;
 use App\Models\User;
 use App\Models\VendorEmployee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -114,6 +115,36 @@ class OutsourcingTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('Outsourcing/Compliance/Index')
                 ->where('summary.total', 0)
+            );
+    }
+
+    public function test_compliance_all_includes_resolved_records_older_than_first_fifty(): void
+    {
+        $user = User::factory()->create();
+        $employer = Company::factory()->create(['type' => 'main']);
+        $vendor = Company::factory()->create(['type' => 'vendor']);
+        $employee = Employee::factory()->create(['company_id' => $employer->id]);
+
+        foreach (range(1, 51) as $index) {
+            OutsourcingComplianceRecord::query()->create([
+                'employee_id' => $employee->id,
+                'vendor_id' => $vendor->id,
+                'flag_type' => 'resolved-'.$index,
+                'description' => 'Resolved record '.$index,
+                'status' => 'resolved',
+                'resolved_at' => now()->subMinutes($index),
+                'resolved_by' => $user->id,
+            ]);
+        }
+
+        $this->actingAs($user)
+            ->get(route('outsourcing.compliance.index', ['per_page' => 'all']))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Outsourcing/Compliance/Index')
+                ->has('resolved.data', 51)
+                ->where('resolved.total', 51)
+                ->where('summary.resolved', 51)
             );
     }
 }
