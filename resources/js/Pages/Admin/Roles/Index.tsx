@@ -15,6 +15,9 @@ import {
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { toast } from 'sonner';
 import { useCan } from '@/hooks/useCan';
 
@@ -30,8 +33,9 @@ type RoleRow = {
 
 export default function Index({
     roles,
+    filters,
     flash,
-}: PageProps<{ roles: RoleRow[] }>) {
+}: PageProps<{ roles: Paginated<RoleRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
     const { can } = useCan();
 
@@ -82,7 +86,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {roles.map((role) => (
+                                {roles.data.map((role) => (
                                     <TableRow key={role.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
@@ -150,6 +154,15 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('admin.roles.index'), { per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={roles} />
+                </div>
             </div>
         </HrisLayout>
     );

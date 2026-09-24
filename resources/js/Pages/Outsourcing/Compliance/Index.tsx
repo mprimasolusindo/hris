@@ -21,6 +21,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { useEffect } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -62,9 +65,9 @@ export default function Index({
     summary,
     flash,
 }: PageProps<{
-    flags: FlagRow[];
-    resolved: ResolvedRow[];
-    filters: { vendor_id: string; severity: string };
+    flags: Paginated<FlagRow>;
+    resolved: Paginated<ResolvedRow>;
+    filters: { vendor_id: string; severity: string; per_page: string };
     vendors: Array<{ id: number; name: string }>;
     summary: {
         total: number;
@@ -225,7 +228,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {flags.length === 0 ? (
+                                {flags.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -235,7 +238,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    flags.map((row) => (
+                                    flags.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell>
                                                 <Badge
@@ -283,8 +286,9 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <TablePagination paginator={flags} />
 
-                {resolved.length > 0 && (
+                {resolved.data.length > 0 && (
                     <Card>
                         <CardHeader>
                             <CardTitle>{t('resolved')}</CardTitle>
@@ -301,7 +305,7 @@ export default function Index({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {resolved.map((row) => (
+                                    {resolved.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell className="font-mono text-xs">
                                                 {row.type}
@@ -328,6 +332,15 @@ export default function Index({
                         </CardContent>
                     </Card>
                 )}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('outsourcing.compliance.index'), { ...filters, per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={resolved} />
+                </div>
             </div>
         </HrisLayout>
     );

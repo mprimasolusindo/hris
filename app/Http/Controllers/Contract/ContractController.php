@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Contract;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\EmploymentContract;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,15 +38,19 @@ class ContractController extends Controller
             })
             ->values();
 
+        $expiringCount = $contracts->where('is_expiring', true)->count();
+        $perPage = ListPaginator::resolvePerPage($request);
+        $contracts = ListPaginator::paginateCollection($contracts, $request);
+
         return Inertia::render('Contracts/Index', [
             'contracts' => $contracts,
-            'filters' => ['type' => $type, 'status' => $status],
+            'filters' => ['type' => $type, 'status' => $status, 'per_page' => (string) $perPage],
             'contractTypes' => self::CONTRACT_TYPES,
             'employees' => Employee::query()
                 ->where('status', 'active')
                 ->orderBy('full_name')
                 ->get(['id', 'full_name', 'employee_code']),
-            'expiringCount' => $contracts->where('is_expiring', true)->count(),
+            'expiringCount' => $expiringCount,
         ]);
     }
 

@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\EmploymentContract;
 use App\Models\OutsourcingComplianceRecord;
 use App\Models\VendorEmployee;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -91,18 +92,27 @@ class ComplianceController extends Controller
                 'resolved_at' => $r->resolved_at?->toDateTimeString(),
             ]);
 
+        $summary = [
+            'total' => $openFlags->count(),
+            'high' => $openFlags->where('severity', 'high')->count(),
+            'medium' => $openFlags->where('severity', 'medium')->count(),
+            'low' => $openFlags->where('severity', 'low')->count(),
+            'resolved' => $resolved->count(),
+        ];
+        $perPage = ListPaginator::resolvePerPage($request);
+        $openFlags = ListPaginator::paginateCollection($openFlags, $request);
+        $resolved = ListPaginator::paginateCollection($resolved, $request);
+
         return Inertia::render('Outsourcing/Compliance/Index', [
             'flags' => $openFlags,
             'resolved' => $resolved,
-            'filters' => ['vendor_id' => $vendorId, 'severity' => $severity],
-            'vendors' => Company::query()->where('type', 'vendor')->orderBy('name')->get(['id', 'name']),
-            'summary' => [
-                'total' => $openFlags->count(),
-                'high' => $openFlags->where('severity', 'high')->count(),
-                'medium' => $openFlags->where('severity', 'medium')->count(),
-                'low' => $openFlags->where('severity', 'low')->count(),
-                'resolved' => $resolved->count(),
+            'filters' => [
+                'vendor_id' => $vendorId,
+                'severity' => $severity,
+                'per_page' => (string) $perPage,
             ],
+            'vendors' => Company::query()->where('type', 'vendor')->orderBy('name')->get(['id', 'name']),
+            'summary' => $summary,
         ]);
     }
 

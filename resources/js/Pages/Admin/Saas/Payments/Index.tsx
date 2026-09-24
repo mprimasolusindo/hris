@@ -29,6 +29,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -56,10 +59,12 @@ function formatIdr(value: number) {
 
 export default function Index({
     payments,
+    filters,
     tenants,
     flash,
 }: PageProps<{
-    payments: PaymentRow[];
+    payments: Paginated<PaymentRow>;
+    filters: { per_page: string };
     tenants: Array<{ id: number; name: string }>;
 }>) {
     const { t } = useLanguage();
@@ -262,7 +267,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {payments.length === 0 ? (
+                                {payments.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -272,7 +277,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    payments.map((row) => (
+                                    payments.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell>
                                                 {row.tenant_name}
@@ -320,6 +325,15 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('admin.saas.payments.index'), { per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={payments} />
+                </div>
             </div>
         </HrisLayout>
     );

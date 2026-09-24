@@ -7,32 +7,36 @@ use App\Http\Requests\Admin\StoreRoleRequest;
 use App\Http\Requests\Admin\UpdateRoleRequest;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class RoleController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $this->authorize('roles.view');
 
-        $roles = Role::query()
-            ->withCount(['users', 'permissions'])
-            ->orderBy('name')
-            ->get()
-            ->map(fn (Role $role) => [
-                'id' => $role->id,
-                'name' => $role->name,
-                'slug' => $role->slug,
-                'description' => $role->description,
-                'is_system' => $role->is_system,
-                'users_count' => $role->users_count,
-                'permissions_count' => $role->permissions_count,
-            ]);
+        $perPage = ListPaginator::resolvePerPage($request);
+        $roles = ListPaginator::paginate(
+            Role::query()->withCount(['users', 'permissions'])->orderBy('name'),
+            $request,
+        );
+        $roles->getCollection()->transform(fn (Role $role) => [
+            'id' => $role->id,
+            'name' => $role->name,
+            'slug' => $role->slug,
+            'description' => $role->description,
+            'is_system' => $role->is_system,
+            'users_count' => $role->users_count,
+            'permissions_count' => $role->permissions_count,
+        ]);
 
         return Inertia::render('Admin/Roles/Index', [
             'roles' => $roles,
+            'filters' => ['per_page' => (string) $perPage],
         ]);
     }
 

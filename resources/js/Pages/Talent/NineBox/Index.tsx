@@ -28,6 +28,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -63,14 +66,16 @@ export default function Index({
     grid,
     year,
     years,
+    filters,
     employees,
     summary,
     flash,
 }: PageProps<{
-    items: AssessmentItem[];
+    items: Paginated<AssessmentItem>;
     grid: GridCell[][];
     year: number;
     years: number[];
+    filters: { per_page: string };
     employees: Array<{ id: number; name: string }>;
     summary: { total: number; stars: number };
 }>) {
@@ -130,7 +135,11 @@ export default function Index({
     };
 
     const changeYear = (value: string) => {
-        router.get(route('succession.nine-box.index'), { year: value }, { preserveState: true });
+        router.get(
+            route('succession.nine-box.index'),
+            { year: value, per_page: filters.per_page },
+            { preserveState: true },
+        );
     };
 
     return (
@@ -323,7 +332,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {items.length === 0 ? (
+                                {items.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={5}
@@ -333,7 +342,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    items.map((item) => (
+                                    items.data.map((item) => (
                                         <TableRow key={item.id}>
                                             <TableCell>{item.employee_name}</TableCell>
                                             <TableCell>{item.performance_score}</TableCell>
@@ -366,6 +375,19 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('succession.nine-box.index'), {
+                                year,
+                                per_page: v,
+                                page: 1,
+                            })
+                        }
+                    />
+                    <TablePagination paginator={items} />
+                </div>
             </div>
         </HrisLayout>
     );

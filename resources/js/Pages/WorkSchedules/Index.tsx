@@ -23,6 +23,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -61,8 +64,9 @@ const emptyForm = {
 
 export default function Index({
     schedules,
+    filters,
     flash,
-}: PageProps<{ schedules: ScheduleRow[] }>) {
+}: PageProps<{ schedules: Paginated<ScheduleRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
     const [open, setOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -164,14 +168,14 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {schedules.length === 0 ? (
+                                {schedules.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                                             {t('noData')}
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    schedules.map((row) => (
+                                    schedules.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell className="font-mono text-sm">{row.code}</TableCell>
                                             <TableCell>{row.name}</TableCell>
@@ -205,6 +209,15 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('work-schedules.index'), { per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={schedules} />
+                </div>
             </div>
 
             <Dialog

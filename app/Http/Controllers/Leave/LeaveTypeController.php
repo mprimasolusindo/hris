@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Leave;
 
 use App\Http\Controllers\Controller;
 use App\Models\LeaveType;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -12,15 +13,15 @@ use Inertia\Response;
 
 class LeaveTypeController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $types = LeaveType::query()
-            ->orderBy('name')
-            ->get()
-            ->map(fn (LeaveType $type) => $this->serialize($type));
+        $perPage = ListPaginator::resolvePerPage($request);
+        $types = ListPaginator::paginate(LeaveType::query()->orderBy('name'), $request);
+        $types->getCollection()->transform(fn (LeaveType $type) => $this->serialize($type));
 
         return Inertia::render('Leave/Types', [
             'types' => $types,
+            'filters' => ['per_page' => (string) $perPage],
         ]);
     }
 

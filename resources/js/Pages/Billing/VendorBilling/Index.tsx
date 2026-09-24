@@ -28,6 +28,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { FileText } from 'lucide-react';
 import { toast } from 'sonner';
@@ -76,9 +79,9 @@ export default function Index({
     vendors,
     flash,
 }: PageProps<{
-    lines: BillingLine[];
-    invoices: Invoice[];
-    filters: { month: number; year: number };
+    lines: Paginated<BillingLine>;
+    invoices: Paginated<Invoice>;
+    filters: { month: number; year: number; per_page: string };
     period_label: string;
     vendors: Array<{ id: number; name: string }>;
 }>) {
@@ -207,7 +210,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {lines.length === 0 ? (
+                                {lines.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={5}
@@ -217,7 +220,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    lines.map((row) => (
+                                    lines.data.map((row) => (
                                         <TableRow key={row.vendor_id}>
                                             <TableCell>
                                                 {row.vendor_name}
@@ -249,6 +252,7 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <TablePagination paginator={lines} />
 
                 <Card>
                     <CardHeader>
@@ -271,7 +275,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {invoices.length === 0 ? (
+                                {invoices.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -281,7 +285,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    invoices.map((invoice) => (
+                                    invoices.data.map((invoice) => (
                                         <TableRow key={invoice.id}>
                                             <TableCell className="font-mono text-xs">
                                                 {invoice.invoice_number}
@@ -330,6 +334,15 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('vendor-billing.index'), { ...filters, per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={invoices} />
+                </div>
             </div>
 
             <Dialog open={open} onOpenChange={setOpen}>

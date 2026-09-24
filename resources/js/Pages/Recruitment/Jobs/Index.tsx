@@ -31,6 +31,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -55,8 +58,8 @@ export default function Index({
     formOptions,
     flash,
 }: PageProps<{
-    jobs: JobRow[];
-    filters: { status: string; company_id: string };
+    jobs: Paginated<JobRow>;
+    filters: { status: string; company_id: string; per_page: string };
     summary: { open: number; total: number };
     statusOptions: string[];
     formOptions: JobFormLookups;
@@ -173,7 +176,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {jobs.length === 0 ? (
+                                {jobs.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -183,7 +186,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    jobs.map((row) => (
+                                    jobs.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell className="font-mono text-sm">
                                                 {row.code || '—'}
@@ -212,6 +215,15 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('recruitment.jobs.index'), { ...filters, per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={jobs} />
+                </div>
             </div>
         </HrisLayout>
     );

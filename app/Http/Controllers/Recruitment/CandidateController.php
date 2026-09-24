@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Recruitment;
 use App\Http\Controllers\Controller;
 use App\Models\Candidate;
 use App\Models\JobPosting;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,7 +17,7 @@ class CandidateController extends Controller
     {
         $search = (string) $request->query('search', '');
 
-        $candidates = Candidate::query()
+        $query = Candidate::query()
             ->withCount('applications')
             ->when($search !== '', function ($q) use ($search) {
                 $q->where(function ($inner) use ($search) {
@@ -25,21 +26,23 @@ class CandidateController extends Controller
                         ->orWhere('phone', 'like', "%{$search}%");
                 });
             })
-            ->latest()
-            ->get()
-            ->map(fn (Candidate $candidate) => [
-                'id' => $candidate->id,
-                'name' => $candidate->name,
-                'email' => $candidate->email,
-                'phone' => $candidate->phone,
-                'application_count' => $candidate->applications_count,
-                'created_at' => $candidate->created_at?->toDateTimeString(),
-            ]);
+            ->latest();
+
+        $perPage = ListPaginator::resolvePerPage($request);
+        $candidates = ListPaginator::paginate($query, $request);
+        $candidates->getCollection()->transform(fn (Candidate $candidate) => [
+            'id' => $candidate->id,
+            'name' => $candidate->name,
+            'email' => $candidate->email,
+            'phone' => $candidate->phone,
+            'application_count' => $candidate->applications_count,
+            'created_at' => $candidate->created_at?->toDateTimeString(),
+        ]);
 
         return Inertia::render('Recruitment/Candidates/Index', [
             'candidates' => $candidates,
-            'filters' => ['search' => $search],
-            'summary' => ['total' => $candidates->count()],
+            'filters' => ['search' => $search, 'per_page' => (string) $perPage],
+            'summary' => ['total' => $candidates->total()],
         ]);
     }
 

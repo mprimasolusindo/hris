@@ -20,6 +20,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 
 type TrackingRow = {
     id: number;
@@ -37,8 +40,8 @@ export default function Index({
     sites,
     summary,
 }: PageProps<{
-    rows: TrackingRow[];
-    filters: { month: number; year: number; vendor_id: string; site_id: string };
+    rows: Paginated<TrackingRow>;
+    filters: { month: number; year: number; vendor_id: string; site_id: string; per_page: string };
     vendors: Array<{ id: number; name: string }>;
     sites: Array<{ id: number; name: string }>;
     summary: { active_placements: number; total_present_days: number };
@@ -154,7 +157,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {rows.length === 0 ? (
+                                {rows.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={4}
@@ -164,7 +167,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    rows.map((row) => (
+                                    rows.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell>
                                                 {row.employee_name}
@@ -182,6 +185,15 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('outsourcing.tracking.index'), { ...filters, per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={rows} />
+                </div>
             </div>
         </HrisLayout>
     );

@@ -59,12 +59,14 @@ class BugReportTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->get(route('bug-reports.index'))
+            ->get(route('bug-reports.index', ['per_page' => '10']))
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('BugReports/Index')
-                ->has('reports', 1)
-                ->where('reports.0.title', 'Test bug')
+                ->has('reports.data', 1)
+                ->where('reports.data.0.title', 'Test bug')
+                ->where('reports.per_page', 10)
+                ->where('filters.per_page', '10')
             );
     }
 

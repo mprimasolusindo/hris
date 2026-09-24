@@ -23,6 +23,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -37,8 +40,9 @@ type TypeRow = {
 
 export default function Types({
     types,
+    filters,
     flash,
-}: PageProps<{ types: TypeRow[] }>) {
+}: PageProps<{ types: Paginated<TypeRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
     const [open, setOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -118,14 +122,14 @@ export default function Types({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {types.length === 0 ? (
+                                {types.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
                                             {t('noData')}
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    types.map((row) => (
+                                    types.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell className="font-mono text-sm">{row.code}</TableCell>
                                             <TableCell>{row.name}</TableCell>
@@ -152,6 +156,15 @@ export default function Types({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('leave.types.index'), { per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={types} />
+                </div>
             </div>
 
             <Dialog

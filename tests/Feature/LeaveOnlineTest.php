@@ -157,7 +157,7 @@ class LeaveOnlineTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('Leave/Balance')
                 ->where('selfService', true)
-                ->has('balances', 1)
-                ->where('balances.0.employee_id', $mine->id));
+                ->has('balances.data', 1)
+                ->where('balances.data.0.employee_id', $mine->id));
     }
 }

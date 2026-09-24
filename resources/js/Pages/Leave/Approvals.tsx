@@ -12,6 +12,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { useEffect } from 'react';
 import { Check, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,8 +32,9 @@ type PendingRow = {
 
 export default function Approvals({
     pending,
+    filters,
     flash,
-}: PageProps<{ pending: PendingRow[] }>) {
+}: PageProps<{ pending: Paginated<PendingRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
 
     useEffect(() => {
@@ -62,7 +66,7 @@ export default function Approvals({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {pending.length === 0 ? (
+                                {pending.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -72,7 +76,7 @@ export default function Approvals({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    pending.map((row) => (
+                                    pending.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell>
                                                 {row.employee_name}
@@ -117,6 +121,15 @@ export default function Approvals({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('leave.approvals.index'), { per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={pending} />
+                </div>
             </div>
         </HrisLayout>
     );

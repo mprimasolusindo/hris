@@ -7,6 +7,7 @@ use App\Http\Requests\BugReport\StoreBugReportRequest;
 use App\Http\Requests\BugReport\UpdateBugReportStatusRequest;
 use App\Http\Resources\BugReportResource;
 use App\Models\BugReport;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -26,13 +27,17 @@ class BugReportController extends Controller
             $query->where('status', $status);
         }
 
+        $perPage = ListPaginator::resolvePerPage($request);
+        $reports = ListPaginator::paginate($query, $request);
+        $reports->getCollection()->transform(
+            fn (BugReport $report) => (new BugReportResource($report))->resolve()
+        );
+
         return Inertia::render('BugReports/Index', [
-            'reports' => $query->get()
-                ->map(fn (BugReport $report) => (new BugReportResource($report))->resolve())
-                ->values()
-                ->all(),
+            'reports' => $reports,
             'filters' => [
                 'status' => is_string($status) ? $status : '',
+                'per_page' => (string) $perPage,
             ],
             'statuses' => BugReport::STATUSES,
         ]);

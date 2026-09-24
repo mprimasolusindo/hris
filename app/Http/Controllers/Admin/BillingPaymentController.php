@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BillingPayment;
 use App\Models\Tenant;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,22 +13,26 @@ use Inertia\Response;
 
 class BillingPaymentController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = ListPaginator::resolvePerPage($request);
+        $payments = ListPaginator::paginate(
+            BillingPayment::query()->with('tenant:id,name')->latest(),
+            $request,
+        );
+        $payments->getCollection()->transform(fn (BillingPayment $payment) => [
+            'id' => $payment->id,
+            'tenant_id' => $payment->tenant_id,
+            'tenant_name' => $payment->tenant?->name,
+            'amount' => (float) $payment->amount,
+            'method' => $payment->method,
+            'status' => $payment->status,
+            'paid_at' => $payment->paid_at?->toDateTimeString(),
+        ]);
+
         return Inertia::render('Admin/Saas/Payments/Index', [
-            'payments' => BillingPayment::query()
-                ->with('tenant:id,name')
-                ->latest()
-                ->get()
-                ->map(fn (BillingPayment $payment) => [
-                    'id' => $payment->id,
-                    'tenant_id' => $payment->tenant_id,
-                    'tenant_name' => $payment->tenant?->name,
-                    'amount' => (float) $payment->amount,
-                    'method' => $payment->method,
-                    'status' => $payment->status,
-                    'paid_at' => $payment->paid_at?->toDateTimeString(),
-                ]),
+            'payments' => $payments,
+            'filters' => ['per_page' => (string) $perPage],
             'tenants' => Tenant::query()->orderBy('name')->get(['id', 'name']),
         ]);
     }

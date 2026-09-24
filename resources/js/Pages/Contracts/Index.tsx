@@ -29,6 +29,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { AlertTriangle, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -53,8 +56,8 @@ export default function Index({
     expiringCount,
     flash,
 }: PageProps<{
-    contracts: ContractRow[];
-    filters: { type: string; status: string };
+    contracts: Paginated<ContractRow>;
+    filters: { type: string; status: string; per_page: string };
     contractTypes: string[];
     employees: Array<{ id: number; full_name: string; employee_code: string }>;
     expiringCount: number;
@@ -248,7 +251,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {contracts.length === 0 ? (
+                                {contracts.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -258,7 +261,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    contracts.map((row) => (
+                                    contracts.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell>
                                                 <Link
@@ -288,6 +291,15 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('contracts.index'), { ...filters, per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={contracts} />
+                </div>
             </div>
         </HrisLayout>
     );

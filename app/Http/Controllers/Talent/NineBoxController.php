@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Talent;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\NineBoxAssessment;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -80,16 +81,21 @@ class NineBoxController extends Controller
             $years->push($year);
         }
 
+        $summary = [
+            'total' => $items->count(),
+            'stars' => $items->where('box_label', 'Star')->count(),
+        ];
+        $perPage = ListPaginator::resolvePerPage($request);
+        $items = ListPaginator::paginateCollection($items, $request);
+
         return Inertia::render('Talent/NineBox/Index', [
             'items' => $items,
             'grid' => $grid,
             'year' => $year,
             'years' => $years->sortDesc()->values(),
+            'filters' => ['per_page' => (string) $perPage],
             'employees' => $this->employeeOptions(),
-            'summary' => [
-                'total' => $items->count(),
-                'stars' => $items->where('box_label', 'Star')->count(),
-            ],
+            'summary' => $summary,
         ]);
     }
 

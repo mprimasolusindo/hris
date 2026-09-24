@@ -13,6 +13,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 
 type TypeBalance = {
     entitlement: number;
@@ -34,7 +37,12 @@ type BalanceRow = {
 export default function Balance({
     year,
     balances,
-}: PageProps<{ year: number; balances: BalanceRow[] }>) {
+    filters,
+}: PageProps<{
+    year: number;
+    balances: Paginated<BalanceRow>;
+    filters: { per_page: string };
+}>) {
     const { t } = useLanguage();
 
     return (
@@ -55,6 +63,7 @@ export default function Balance({
                                 onChange={(e) =>
                                     router.get(route('leave.balance.index'), {
                                         year: e.target.value,
+                                        per_page: filters.per_page,
                                     })
                                 }
                             />
@@ -76,7 +85,7 @@ export default function Balance({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {balances.length === 0 ? (
+                                {balances.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -86,7 +95,7 @@ export default function Balance({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    balances.map((row) => (
+                                    balances.data.map((row) => (
                                         <TableRow key={row.employee_id}>
                                             <TableCell>{row.employee_name}</TableCell>
                                             <TableCell>{row.employee_code}</TableCell>
@@ -108,6 +117,15 @@ export default function Balance({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('leave.balance.index'), { year, per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={balances} />
+                </div>
             </div>
         </HrisLayout>
     );

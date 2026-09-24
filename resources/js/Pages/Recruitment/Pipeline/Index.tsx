@@ -28,6 +28,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { LayoutGrid, List, Plus, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
@@ -53,8 +56,8 @@ export default function Index({
 }: PageProps<{
     stages: string[];
     board: Record<string, PipelineCard[]>;
-    applications: PipelineCard[];
-    filters: { job_id: string };
+    applications: Paginated<PipelineCard>;
+    filters: { job_id: string; per_page: string };
     jobs: Array<{ id: number; title: string }>;
     candidates: Array<{ id: number; name: string }>;
 }>) {
@@ -74,6 +77,7 @@ export default function Index({
     const applyJobFilter = (jobId: string) => {
         router.get(route('recruitment.pipeline.index'), {
             job_id: jobId === 'all' ? '' : jobId,
+            per_page: filters.per_page,
         });
     };
 
@@ -282,7 +286,7 @@ export default function Index({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {applications.length === 0 ? (
+                                    {applications.data.length === 0 ? (
                                         <TableRow>
                                             <TableCell
                                                 colSpan={5}
@@ -292,7 +296,7 @@ export default function Index({
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        applications.map((row) => (
+                                        applications.data.map((row) => (
                                             <TableRow key={row.id}>
                                                 <TableCell>{row.candidate_name}</TableCell>
                                                 <TableCell>{row.job_title}</TableCell>
@@ -336,6 +340,21 @@ export default function Index({
                             </Table>
                         </CardContent>
                     </Card>
+                )}
+                {view === 'list' && (
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <PerPageSelect
+                            value={filters.per_page}
+                            onChange={(v) =>
+                                router.get(route('recruitment.pipeline.index'), {
+                                    ...filters,
+                                    per_page: v,
+                                    page: 1,
+                                })
+                            }
+                        />
+                        <TablePagination paginator={applications} />
+                    </div>
                 )}
             </div>
         </HrisLayout>

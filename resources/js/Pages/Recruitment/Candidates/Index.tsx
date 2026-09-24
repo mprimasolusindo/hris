@@ -21,6 +21,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
@@ -39,8 +42,8 @@ export default function Index({
     summary,
     flash,
 }: PageProps<{
-    candidates: CandidateRow[];
-    filters: { search: string };
+    candidates: Paginated<CandidateRow>;
+    filters: { search: string; per_page: string };
     summary: { total: number };
 }>) {
     const { t } = useLanguage();
@@ -68,7 +71,7 @@ export default function Index({
     };
 
     const runSearch = () => {
-        router.get(route('recruitment.candidates.index'), { search });
+        router.get(route('recruitment.candidates.index'), { search, per_page: filters.per_page });
     };
 
     return (
@@ -154,7 +157,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {candidates.length === 0 ? (
+                                {candidates.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={4}
@@ -164,7 +167,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    candidates.map((row) => (
+                                    candidates.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell>
                                                 <Link
@@ -187,6 +190,19 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('recruitment.candidates.index'), {
+                                search: filters.search,
+                                per_page: v,
+                                page: 1,
+                            })
+                        }
+                    />
+                    <TablePagination paginator={candidates} />
+                </div>
             </div>
         </HrisLayout>
     );

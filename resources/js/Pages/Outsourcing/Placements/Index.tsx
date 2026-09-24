@@ -28,6 +28,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -51,8 +54,8 @@ export default function Index({
     employees,
     flash,
 }: PageProps<{
-    placements: PlacementRow[];
-    filters: { vendor_id: string };
+    placements: Paginated<PlacementRow>;
+    filters: { vendor_id: string; per_page: string };
     vendors: Array<{ id: number; name: string }>;
     employees: Array<{ id: number; full_name: string; employee_code: string }>;
 }>) {
@@ -72,6 +75,7 @@ export default function Index({
     const applyVendorFilter = (vendorId: string) => {
         router.get(route('outsourcing.index'), {
             vendor_id: vendorId === 'all' ? '' : vendorId,
+            per_page: filters.per_page,
         });
     };
 
@@ -220,7 +224,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {placements.length === 0 ? (
+                                {placements.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -230,7 +234,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    placements.map((row) => (
+                                    placements.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell>
                                                 {row.employee_name}
@@ -275,6 +279,15 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('outsourcing.index'), { ...filters, per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={placements} />
+                </div>
             </div>
         </HrisLayout>
     );

@@ -76,13 +76,15 @@ class OutsourcingTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->get(route('outsourcing.compliance.index'));
+            ->get(route('outsourcing.compliance.index', ['per_page' => '10']));
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Outsourcing/Compliance/Index')
-            ->has('flags', 1)
-            ->where('flags.0.type', 'missing_outsourcing_contract')
+            ->has('flags.data', 1)
+            ->where('flags.data.0.type', 'missing_outsourcing_contract')
+            ->where('flags.per_page', 10)
+            ->where('filters.per_page', '10')
         );
     }
 

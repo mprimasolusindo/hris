@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Employee;
 use App\Models\VendorEmployee;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,32 +18,34 @@ class PlacementController extends Controller
     {
         $vendorId = (string) $request->query('vendor_id', '');
 
-        $placements = VendorEmployee::query()
-            ->with([
+        $perPage = ListPaginator::resolvePerPage($request);
+        $placements = ListPaginator::paginate(
+            VendorEmployee::query()->with([
                 'vendor:id,name',
                 'employee:id,full_name,employee_code,status,company_id',
                 'employee.company:id,name',
                 'employee.siteAssignments.site:id,name',
             ])
-            ->when($vendorId !== '', fn ($q) => $q->where('vendor_id', $vendorId))
-            ->latest()
-            ->get()
-            ->map(fn (VendorEmployee $row) => [
-                'id' => $row->id,
-                'vendor_id' => $row->vendor_id,
-                'vendor_name' => $row->vendor?->name,
-                'employee_id' => $row->employee_id,
-                'employee_name' => $row->employee?->full_name,
-                'employee_code' => $row->employee?->employee_code,
-                'employer_name' => $row->employee?->company?->name,
-                'site_name' => $row->employee?->siteAssignments->first()?->site?->name,
-                'status' => $row->employee?->status === 'active' ? 'active' : 'ended',
-                'created_at' => $row->created_at?->toDateTimeString(),
-            ]);
+                ->when($vendorId !== '', fn ($q) => $q->where('vendor_id', $vendorId))
+                ->latest(),
+            $request,
+        );
+        $placements->getCollection()->transform(fn (VendorEmployee $row) => [
+            'id' => $row->id,
+            'vendor_id' => $row->vendor_id,
+            'vendor_name' => $row->vendor?->name,
+            'employee_id' => $row->employee_id,
+            'employee_name' => $row->employee?->full_name,
+            'employee_code' => $row->employee?->employee_code,
+            'employer_name' => $row->employee?->company?->name,
+            'site_name' => $row->employee?->siteAssignments->first()?->site?->name,
+            'status' => $row->employee?->status === 'active' ? 'active' : 'ended',
+            'created_at' => $row->created_at?->toDateTimeString(),
+        ]);
 
         return Inertia::render('Outsourcing/Placements/Index', [
             'placements' => $placements,
-            'filters' => ['vendor_id' => $vendorId],
+            'filters' => ['vendor_id' => $vendorId, 'per_page' => (string) $perPage],
             'vendors' => Company::query()->where('type', 'vendor')->orderBy('name')->get(['id', 'name']),
             'employees' => Employee::query()
                 ->where('status', 'active')

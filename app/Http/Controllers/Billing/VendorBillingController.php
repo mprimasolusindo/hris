@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\Company;
 use App\Models\VendorEmployee;
 use App\Models\VendorInvoice;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -66,26 +67,28 @@ class VendorBillingController extends Controller
             ];
         })->values()->sortBy('vendor_name')->values();
 
-        $invoices = VendorInvoice::query()
-            ->with('vendor:id,name')
-            ->latest()
-            ->get()
-            ->map(fn (VendorInvoice $invoice) => [
-                'id' => $invoice->id,
-                'invoice_number' => $invoice->invoice_number,
-                'vendor_id' => $invoice->vendor_id,
-                'vendor_name' => $invoice->vendor?->name,
-                'period_start' => $invoice->period_start?->toDateString(),
-                'period_end' => $invoice->period_end?->toDateString(),
-                'amount' => (float) $invoice->amount,
-                'status' => $invoice->status,
-                'paid_at' => $invoice->paid_at?->toDateTimeString(),
-            ]);
+        $perPage = ListPaginator::resolvePerPage($request);
+        $lines = ListPaginator::paginateCollection($lines, $request);
+        $invoices = ListPaginator::paginate(
+            VendorInvoice::query()->with('vendor:id,name')->latest(),
+            $request,
+        );
+        $invoices->getCollection()->transform(fn (VendorInvoice $invoice) => [
+            'id' => $invoice->id,
+            'invoice_number' => $invoice->invoice_number,
+            'vendor_id' => $invoice->vendor_id,
+            'vendor_name' => $invoice->vendor?->name,
+            'period_start' => $invoice->period_start?->toDateString(),
+            'period_end' => $invoice->period_end?->toDateString(),
+            'amount' => (float) $invoice->amount,
+            'status' => $invoice->status,
+            'paid_at' => $invoice->paid_at?->toDateTimeString(),
+        ]);
 
         return Inertia::render('Billing/VendorBilling/Index', [
             'lines' => $lines,
             'invoices' => $invoices,
-            'filters' => ['month' => $month, 'year' => $year],
+            'filters' => ['month' => $month, 'year' => $year, 'per_page' => (string) $perPage],
             'period_label' => $periodStart->format('F Y'),
             'vendors' => Company::query()->where('type', 'vendor')->orderBy('name')->get(['id', 'name']),
         ]);

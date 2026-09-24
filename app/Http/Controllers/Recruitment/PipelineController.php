@@ -12,6 +12,7 @@ use App\Models\EmployeeSite;
 use App\Models\EmploymentContract;
 use App\Models\JobPosting;
 use App\Models\Site;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,11 +51,14 @@ class PipelineController extends Controller
             return [$stage => $applications->where('stage', $stage)->values()];
         });
 
+        $perPage = ListPaginator::resolvePerPage($request);
+        $applications = ListPaginator::paginateCollection($applications, $request);
+
         return Inertia::render('Recruitment/Pipeline/Index', [
             'stages' => self::STAGES,
             'board' => $byStage,
             'applications' => $applications,
-            'filters' => ['job_id' => $jobId],
+            'filters' => ['job_id' => $jobId, 'per_page' => (string) $perPage],
             'jobs' => JobPosting::query()->orderBy('title')->get(['id', 'title']),
             'candidates' => Candidate::query()->orderBy('name')->get(['id', 'name']),
         ]);

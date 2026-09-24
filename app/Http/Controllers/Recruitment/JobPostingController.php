@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\JobPosting;
 use App\Models\Position;
 use App\Models\Site;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -28,34 +29,40 @@ class JobPostingController extends Controller
         $status = (string) $request->query('status', '');
         $companyId = (string) $request->query('company_id', '');
 
-        $jobs = JobPosting::query()
+        $query = JobPosting::query()
             ->with('company:id,name')
             ->withCount('applications')
             ->when($status !== '', fn ($q) => $q->where('status', $status))
             ->when($companyId !== '', fn ($q) => $q->where('company_id', $companyId))
-            ->latest()
-            ->get()
-            ->map(fn (JobPosting $job) => [
-                'id' => $job->id,
-                'title' => $job->title,
-                'code' => $job->code,
-                'status' => $job->status,
-                'priority' => $job->priority,
-                'employment_type' => $job->employment_type,
-                'headcount' => $job->headcount,
-                'company_name' => $job->company?->name,
-                'application_count' => $job->applications_count,
-                'created_at' => $job->created_at?->toDateTimeString(),
-            ]);
+            ->latest();
 
-        $openCount = $jobs->where('status', 'open')->count();
+        $totalCount = (clone $query)->count();
+        $openCount = (clone $query)->where('status', 'open')->count();
+        $perPage = ListPaginator::resolvePerPage($request);
+        $jobs = ListPaginator::paginate($query, $request);
+        $jobs->getCollection()->transform(fn (JobPosting $job) => [
+            'id' => $job->id,
+            'title' => $job->title,
+            'code' => $job->code,
+            'status' => $job->status,
+            'priority' => $job->priority,
+            'employment_type' => $job->employment_type,
+            'headcount' => $job->headcount,
+            'company_name' => $job->company?->name,
+            'application_count' => $job->applications_count,
+            'created_at' => $job->created_at?->toDateTimeString(),
+        ]);
 
         return Inertia::render('Recruitment/Jobs/Index', [
             'jobs' => $jobs,
-            'filters' => ['status' => $status, 'company_id' => $companyId],
+            'filters' => [
+                'status' => $status,
+                'company_id' => $companyId,
+                'per_page' => (string) $perPage,
+            ],
             'summary' => [
                 'open' => $openCount,
-                'total' => $jobs->count(),
+                'total' => $totalCount,
             ],
             'statusOptions' => self::STATUSES,
             'formOptions' => $this->formOptions(),

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Models\Tenant;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,23 +14,29 @@ use Inertia\Response;
 
 class SubscriptionController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        return Inertia::render('Admin/Saas/Subscriptions/Index', [
-            'subscriptions' => Subscription::query()
+        $perPage = ListPaginator::resolvePerPage($request);
+        $subscriptions = ListPaginator::paginate(
+            Subscription::query()
                 ->with(['tenant:id,name', 'plan:id,name,price'])
-                ->latest()
-                ->get()
-                ->map(fn (Subscription $subscription) => [
-                    'id' => $subscription->id,
-                    'tenant_id' => $subscription->tenant_id,
-                    'tenant_name' => $subscription->tenant?->name,
-                    'plan_id' => $subscription->plan_id,
-                    'plan_name' => $subscription->plan?->name,
-                    'start_date' => $subscription->start_date?->toDateString(),
-                    'end_date' => $subscription->end_date?->toDateString(),
-                    'status' => $subscription->status,
-                ]),
+                ->latest(),
+            $request,
+        );
+        $subscriptions->getCollection()->transform(fn (Subscription $subscription) => [
+            'id' => $subscription->id,
+            'tenant_id' => $subscription->tenant_id,
+            'tenant_name' => $subscription->tenant?->name,
+            'plan_id' => $subscription->plan_id,
+            'plan_name' => $subscription->plan?->name,
+            'start_date' => $subscription->start_date?->toDateString(),
+            'end_date' => $subscription->end_date?->toDateString(),
+            'status' => $subscription->status,
+        ]);
+
+        return Inertia::render('Admin/Saas/Subscriptions/Index', [
+            'subscriptions' => $subscriptions,
+            'filters' => ['per_page' => (string) $perPage],
             'tenants' => Tenant::query()->orderBy('name')->get(['id', 'name']),
             'plans' => SubscriptionPlan::query()->orderBy('price')->get(['id', 'name', 'price']),
         ]);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WorkSchedule;
 
 use App\Http\Controllers\Controller;
 use App\Models\WorkSchedule;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,14 +15,18 @@ use Inertia\Response;
 
 class WorkScheduleController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = ListPaginator::resolvePerPage($request);
+        $schedules = ListPaginator::paginate(
+            WorkSchedule::query()->orderByDesc('is_default')->orderBy('name'),
+            $request,
+        );
+        $schedules->getCollection()->transform(fn (WorkSchedule $schedule) => $this->serialize($schedule));
+
         return Inertia::render('WorkSchedules/Index', [
-            'schedules' => WorkSchedule::query()
-                ->orderByDesc('is_default')
-                ->orderBy('name')
-                ->get()
-                ->map(fn (WorkSchedule $schedule) => $this->serialize($schedule)),
+            'schedules' => $schedules,
+            'filters' => ['per_page' => (string) $perPage],
         ]);
     }
 

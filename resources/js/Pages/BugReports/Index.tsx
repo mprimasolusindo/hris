@@ -19,6 +19,9 @@ import {
 } from '@/Components/ui/table';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps, type BugReportRow } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { Head, Link, router } from '@inertiajs/react';
 import { Bug, Settings } from 'lucide-react';
 import { useEffect } from 'react';
@@ -45,8 +48,8 @@ export default function Index({
     statuses,
     flash,
 }: PageProps<{
-    reports: BugReportRow[];
-    filters: { status: string };
+    reports: Paginated<BugReportRow>;
+    filters: { status: string; per_page: string };
     statuses: string[];
 }>) {
     const { t } = useLanguage();
@@ -71,7 +74,7 @@ export default function Index({
     const onStatusFilter = (value: string) => {
         router.get(
             route('bug-reports.index'),
-            value === 'all' ? {} : { status: value },
+            { ...filters, status: value === 'all' ? undefined : value, page: 1 },
             { preserveState: true, replace: true },
         );
     };
@@ -115,7 +118,7 @@ export default function Index({
                         </Select>
                     </CardHeader>
                     <CardContent>
-                        {reports.length === 0 ? (
+                        {reports.data.length === 0 ? (
                             <p className="text-sm text-muted-foreground">{t('noBugReports')}</p>
                         ) : (
                             <Table>
@@ -130,7 +133,7 @@ export default function Index({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {reports.map((report) => (
+                                    {reports.data.map((report) => (
                                         <TableRow key={report.id}>
                                             <TableCell className="font-medium">{report.title}</TableCell>
                                             <TableCell>
@@ -157,6 +160,15 @@ export default function Index({
                         )}
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('bug-reports.index'), { ...filters, per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={reports} />
+                </div>
             </div>
         </HrisLayout>
     );

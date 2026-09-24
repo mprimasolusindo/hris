@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Leave;
 use App\Models\LeaveType;
+use App\Support\ListPaginator;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -87,9 +88,13 @@ class LeaveBalanceController extends Controller
             ];
         });
 
+        $perPage = ListPaginator::resolvePerPage($request);
+        $balances = ListPaginator::paginateCollection($balances, $request);
+
         return Inertia::render('Leave/Balance', [
             'year' => $year,
             'balances' => $balances,
+            'filters' => ['per_page' => (string) $perPage],
             'typeOptions' => $typeCodes,
             'selfService' => $selfOnly,
         ]);

@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\Company;
 use App\Models\Site;
 use App\Models\VendorEmployee;
+use App\Support\ListPaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -61,6 +62,13 @@ class PlacementTrackingController extends Controller
             })
             ->values();
 
+        $summary = [
+            'active_placements' => $rows->count(),
+            'total_present_days' => $rows->sum('present_days'),
+        ];
+        $perPage = ListPaginator::resolvePerPage($request);
+        $rows = ListPaginator::paginateCollection($rows, $request);
+
         return Inertia::render('Outsourcing/Tracking/Index', [
             'rows' => $rows,
             'filters' => [
@@ -68,13 +76,11 @@ class PlacementTrackingController extends Controller
                 'year' => $year,
                 'vendor_id' => $vendorId,
                 'site_id' => $siteId,
+                'per_page' => (string) $perPage,
             ],
             'vendors' => Company::query()->where('type', 'vendor')->orderBy('name')->get(['id', 'name']),
             'sites' => Site::query()->orderBy('name')->get(['id', 'name']),
-            'summary' => [
-                'active_placements' => $rows->count(),
-                'total_present_days' => $rows->sum('present_days'),
-            ],
+            'summary' => $summary,
         ]);
     }
 }

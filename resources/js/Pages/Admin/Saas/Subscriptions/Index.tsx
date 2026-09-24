@@ -29,6 +29,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -48,11 +51,13 @@ const STATUSES = ['active', 'trialing', 'past_due', 'cancelled', 'expired'];
 
 export default function Index({
     subscriptions,
+    filters,
     tenants,
     plans,
     flash,
 }: PageProps<{
-    subscriptions: SubscriptionRow[];
+    subscriptions: Paginated<SubscriptionRow>;
+    filters: { per_page: string };
     tenants: Array<{ id: number; name: string }>;
     plans: Array<{ id: number; name: string }>;
 }>) {
@@ -276,7 +281,7 @@ export default function Index({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {subscriptions.length === 0 ? (
+                                {subscriptions.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -286,7 +291,7 @@ export default function Index({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    subscriptions.map((row) => (
+                                    subscriptions.data.map((row) => (
                                         <TableRow key={row.id}>
                                             <TableCell>
                                                 {row.tenant_name}
@@ -334,6 +339,15 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(route('admin.saas.subscriptions.index'), { per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={subscriptions} />
+                </div>
             </div>
         </HrisLayout>
     );
