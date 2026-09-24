@@ -3,6 +3,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Card, CardContent } from '@/Components/ui/card';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type ReviewRow = {
     id: number;
@@ -27,13 +28,15 @@ export default function Index({
     reviewers,
     statuses,
     summary,
+    filters,
     flash,
 }: PageProps<{
-    items: ReviewRow[];
+    items: Paginated<ReviewRow>;
     employees: Option[];
     reviewers: Option[];
     statuses: string[];
     summary: { total: number; finalized: number; averageRating: number };
+    filters: { per_page: string };
 }>) {
     const { t } = useLanguage();
 
@@ -72,6 +75,8 @@ export default function Index({
                 pageTitle={t('performance')}
                 addLabel={t('addReview')}
                 items={items}
+                filters={filters}
+                indexUrl={route('performance.index')}
                 flash={flash}
                 columns={[
                     { key: 'employee_name', label: t('employee') },

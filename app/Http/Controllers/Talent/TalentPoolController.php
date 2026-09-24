@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Talent;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\TalentPool;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,13 +17,15 @@ class TalentPoolController extends Controller
 
     private const POTENTIAL = ['low', 'medium', 'high'];
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $entries = TalentPool::query()
-            ->with(['employee:id,full_name,employee_code'])
-            ->latest()
-            ->get()
-            ->map(fn (TalentPool $entry) => [
+        $perPage = ListPaginator::resolvePerPage($request);
+
+        return Inertia::render('Talent/TalentPool/Index', [
+            'items' => ListPaginator::paginate(
+                TalentPool::query()->with(['employee:id,full_name,employee_code'])->latest(),
+                $request,
+            )->through(fn (TalentPool $entry) => [
                 'id' => $entry->id,
                 'employee_id' => $entry->employee_id,
                 'employee_name' => $entry->employee?->full_name,
@@ -30,17 +33,17 @@ class TalentPoolController extends Controller
                 'readiness' => $entry->readiness,
                 'potential' => $entry->potential,
                 'notes' => $entry->notes,
-            ]);
-
-        return Inertia::render('Talent/TalentPool/Index', [
-            'items' => $entries,
+            ]),
             'employees' => $this->employeeOptions(),
             'readinessOptions' => self::READINESS,
             'potentialOptions' => self::POTENTIAL,
             'summary' => [
-                'total' => $entries->count(),
-                'highPotential' => $entries->where('potential', 'high')->count(),
-                'readyNow' => $entries->where('readiness', 'ready_now')->count(),
+                'total' => TalentPool::query()->count(),
+                'highPotential' => TalentPool::query()->where('potential', 'high')->count(),
+                'readyNow' => TalentPool::query()->where('readiness', 'ready_now')->count(),
+            ],
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
             ],
         ]);
     }

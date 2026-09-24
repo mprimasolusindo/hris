@@ -2,6 +2,7 @@ import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { Badge } from '@/Components/ui/badge';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type InterviewRow = {
     id: number;
@@ -23,12 +24,14 @@ export default function Index({
     items,
     applications,
     statuses,
+    filters,
     flash,
 }: PageProps<{
-    items: InterviewRow[];
+    items: Paginated<InterviewRow>;
     applications: Option[];
     statuses: string[];
     summary: { total: number; scheduled: number; completed: number };
+    filters: { per_page: string };
 }>) {
     const { t } = useLanguage();
 
@@ -45,6 +48,8 @@ export default function Index({
             pageTitle={t('interviews')}
             addLabel={t('scheduleInterview')}
             items={items}
+            filters={filters}
+            indexUrl={route('recruitment.interviews.index')}
             flash={flash}
             columns={[
                 { key: 'candidate_name', label: t('candidate') },

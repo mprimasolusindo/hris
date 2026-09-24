@@ -2,6 +2,7 @@ import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { Badge } from '@/Components/ui/badge';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type BpjsRow = {
     id: number;
@@ -23,8 +24,9 @@ const TYPE_OPTIONS = [
 
 export default function Index({
     items,
+    filters,
     flash,
-}: PageProps<{ items: BpjsRow[] }>) {
+}: PageProps<{ items: Paginated<BpjsRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
 
     return (
@@ -33,6 +35,8 @@ export default function Index({
             pageTitle={t('bpjsConfig')}
             addLabel={t('addBpjsConfig')}
             items={items}
+            filters={filters}
+            indexUrl={route('payroll.bpjs-config.index')}
             flash={flash}
             columns={[
                 {

@@ -2,6 +2,7 @@ import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { Badge } from '@/Components/ui/badge';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type PoolRow = {
     id: number;
@@ -20,13 +21,15 @@ export default function Index({
     employees,
     readinessOptions,
     potentialOptions,
+    filters,
     flash,
 }: PageProps<{
-    items: PoolRow[];
+    items: Paginated<PoolRow>;
     employees: Option[];
     readinessOptions: string[];
     potentialOptions: string[];
     summary: { total: number; highPotential: number; readyNow: number };
+    filters: { per_page: string };
 }>) {
     const { t } = useLanguage();
 
@@ -42,6 +45,8 @@ export default function Index({
             pageTitle={t('talentPool')}
             addLabel={t('addTalentPoolEntry')}
             items={items}
+            filters={filters}
+            indexUrl={route('talent-pool.index')}
             flash={flash}
             columns={[
                 { key: 'employee_name', label: t('employee') },

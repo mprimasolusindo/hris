@@ -1,6 +1,7 @@
 import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 import { router } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
@@ -20,11 +21,13 @@ export default function Index({
     holidays,
     year,
     typeOptions,
+    filters,
     flash,
 }: PageProps<{
-    holidays: HolidayRow[];
+    holidays: Paginated<HolidayRow>;
     year: number;
     typeOptions: TypeOption[];
+    filters: { per_page: string; year: number };
 }>) {
     const { t } = useLanguage();
 
@@ -41,6 +44,8 @@ export default function Index({
             pageTitle={t('holidays')}
             addLabel={t('addHoliday')}
             items={holidays}
+            filters={filters}
+            indexUrl={route('holidays.index')}
             flash={flash}
             toolbar={
                 <div className="flex items-center gap-2">
@@ -48,7 +53,11 @@ export default function Index({
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                            router.get(route('holidays.index'), { year: year - 1 }, { preserveState: true })
+                            router.get(
+                                route('holidays.index'),
+                                { year: year - 1, per_page: filters.per_page },
+                                { preserveState: true },
+                            )
                         }
                     >
                         {year - 1}
@@ -58,7 +67,11 @@ export default function Index({
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                            router.get(route('holidays.index'), { year: year + 1 }, { preserveState: true })
+                            router.get(
+                                route('holidays.index'),
+                                { year: year + 1, per_page: filters.per_page },
+                                { preserveState: true },
+                            )
                         }
                     >
                         {year + 1}

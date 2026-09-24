@@ -2,6 +2,7 @@ import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { Badge } from '@/Components/ui/badge';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type TaxRuleRow = {
     id: number;
@@ -22,8 +23,9 @@ const percent = (value: string) => `${(Number(value) * 100).toFixed(2)}%`;
 
 export default function Index({
     items,
+    filters,
     flash,
-}: PageProps<{ items: TaxRuleRow[] }>) {
+}: PageProps<{ items: Paginated<TaxRuleRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
 
     return (
@@ -32,6 +34,8 @@ export default function Index({
             pageTitle={t('taxRules')}
             addLabel={t('addTaxRule')}
             items={items}
+            filters={filters}
+            indexUrl={route('payroll.tax-rules.index')}
             flash={flash}
             columns={[
                 { key: 'name', label: t('name') },

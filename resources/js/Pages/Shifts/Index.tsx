@@ -2,6 +2,7 @@ import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { Button } from '@/Components/ui/button';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 import { Link } from '@inertiajs/react';
 import { Calendar, Users } from 'lucide-react';
 
@@ -14,8 +15,9 @@ type ShiftRow = {
 
 export default function Index({
     shifts,
+    filters,
     flash,
-}: PageProps<{ shifts: ShiftRow[] }>) {
+}: PageProps<{ shifts: Paginated<ShiftRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
 
     return (
@@ -24,6 +26,8 @@ export default function Index({
             pageTitle={t('shifts')}
             addLabel={t('addShift')}
             items={shifts}
+            filters={filters}
+            indexUrl={route('shifts.index')}
             flash={flash}
             detailUrl={(id) => route('shifts.show', id)}
             toolbar={

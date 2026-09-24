@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Shift;
 use App\Http\Controllers\Controller;
 use App\Models\EmployeeShift;
 use App\Models\Shift;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,18 +13,23 @@ use Inertia\Response;
 
 class ShiftController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = ListPaginator::resolvePerPage($request);
+
         return Inertia::render('Shifts/Index', [
-            'shifts' => Shift::query()
-                ->orderBy('name')
-                ->get(['id', 'name', 'start_time', 'end_time'])
-                ->map(fn (Shift $shift) => [
-                    'id' => $shift->id,
-                    'name' => $shift->name,
-                    'start_time' => substr((string) $shift->start_time, 0, 5),
-                    'end_time' => substr((string) $shift->end_time, 0, 5),
-                ]),
+            'shifts' => ListPaginator::paginate(
+                Shift::query()->orderBy('name')->select(['id', 'name', 'start_time', 'end_time']),
+                $request,
+            )->through(fn (Shift $shift) => [
+                'id' => $shift->id,
+                'name' => $shift->name,
+                'start_time' => substr((string) $shift->start_time, 0, 5),
+                'end_time' => substr((string) $shift->end_time, 0, 5),
+            ]),
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
         ]);
     }
 

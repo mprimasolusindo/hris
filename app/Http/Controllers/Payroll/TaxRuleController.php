@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Payroll;
 
 use App\Http\Controllers\Controller;
 use App\Models\TaxRule;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -16,14 +17,22 @@ use Inertia\Response;
  */
 class TaxRuleController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = ListPaginator::resolvePerPage($request);
+
         return Inertia::render('Payroll/TaxRules/Index', [
-            'items' => TaxRule::query()
-                ->orderBy('rule_type')
-                ->orderBy('ptkp_category')
-                ->orderBy('gross_min')
-                ->get(['id', 'name', 'rule_type', 'ptkp_category', 'gross_min', 'gross_max', 'value']),
+            'items' => ListPaginator::paginate(
+                TaxRule::query()
+                    ->orderBy('rule_type')
+                    ->orderBy('ptkp_category')
+                    ->orderBy('gross_min')
+                    ->select(['id', 'name', 'rule_type', 'ptkp_category', 'gross_min', 'gross_max', 'value']),
+                $request,
+            ),
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
         ]);
     }
 

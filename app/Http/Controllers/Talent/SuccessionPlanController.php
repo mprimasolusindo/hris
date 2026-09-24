@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\SuccessionPlan;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,17 +16,21 @@ class SuccessionPlanController extends Controller
 {
     private const READINESS = ['ready_now', 'ready_1_2_years', 'ready_3_plus_years'];
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $plans = SuccessionPlan::query()
-            ->with([
-                'position:id,name',
-                'successor:id,full_name',
-                'incumbent:id,full_name',
-            ])
-            ->latest()
-            ->get()
-            ->map(fn (SuccessionPlan $plan) => [
+        $perPage = ListPaginator::resolvePerPage($request);
+
+        return Inertia::render('Talent/Succession/Index', [
+            'items' => ListPaginator::paginate(
+                SuccessionPlan::query()
+                    ->with([
+                        'position:id,name',
+                        'successor:id,full_name',
+                        'incumbent:id,full_name',
+                    ])
+                    ->latest(),
+                $request,
+            )->through(fn (SuccessionPlan $plan) => [
                 'id' => $plan->id,
                 'position_id' => $plan->position_id,
                 'position_name' => $plan->position?->name,
@@ -35,16 +40,16 @@ class SuccessionPlanController extends Controller
                 'incumbent_name' => $plan->incumbent?->full_name,
                 'readiness' => $plan->readiness,
                 'notes' => $plan->notes,
-            ]);
-
-        return Inertia::render('Talent/Succession/Index', [
-            'items' => $plans,
+            ]),
             'positions' => Position::query()->orderBy('name')->get(['id', 'name']),
             'employees' => $this->employeeOptions(),
             'readinessOptions' => self::READINESS,
             'summary' => [
-                'total' => $plans->count(),
-                'readyNow' => $plans->where('readiness', 'ready_now')->count(),
+                'total' => SuccessionPlan::query()->count(),
+                'readyNow' => SuccessionPlan::query()->where('readiness', 'ready_now')->count(),
+            ],
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
             ],
         ]);
     }

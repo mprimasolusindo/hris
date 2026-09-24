@@ -2,13 +2,15 @@ import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { Badge } from '@/Components/ui/badge';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type ComponentRow = { id: number; name: string; type: string; is_taxable: boolean };
 
 export default function Index({
     items,
+    filters,
     flash,
-}: PageProps<{ items: ComponentRow[] }>) {
+}: PageProps<{ items: Paginated<ComponentRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
 
     return (
@@ -17,6 +19,8 @@ export default function Index({
             pageTitle={t('masterAllowances')}
             addLabel={t('addAllowanceType')}
             items={items}
+            filters={filters}
+            indexUrl={route('payroll.master-allowances.index')}
             flash={flash}
             columns={[
                 { key: 'name', label: t('name') },

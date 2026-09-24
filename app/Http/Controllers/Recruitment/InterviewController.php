@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Recruitment;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Interview;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,17 +15,21 @@ class InterviewController extends Controller
 {
     private const STATUSES = ['scheduled', 'completed', 'cancelled', 'no_show'];
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $interviews = Interview::query()
-            ->with([
-                'application:id,candidate_id,job_id,stage',
-                'application.candidate:id,name',
-                'application.jobPosting:id,title',
-            ])
-            ->orderByDesc('scheduled_at')
-            ->get()
-            ->map(fn (Interview $interview) => [
+        $perPage = ListPaginator::resolvePerPage($request);
+
+        return Inertia::render('Recruitment/Interviews/Index', [
+            'items' => ListPaginator::paginate(
+                Interview::query()
+                    ->with([
+                        'application:id,candidate_id,job_id,stage',
+                        'application.candidate:id,name',
+                        'application.jobPosting:id,title',
+                    ])
+                    ->orderByDesc('scheduled_at'),
+                $request,
+            )->through(fn (Interview $interview) => [
                 'id' => $interview->id,
                 'application_id' => $interview->application_id,
                 'candidate_name' => $interview->application?->candidate?->name,
@@ -36,16 +41,16 @@ class InterviewController extends Controller
                 'status' => $interview->status,
                 'feedback' => $interview->feedback,
                 'rating' => $interview->rating,
-            ]);
-
-        return Inertia::render('Recruitment/Interviews/Index', [
-            'items' => $interviews,
+            ]),
             'applications' => $this->applicationOptions(),
             'statuses' => self::STATUSES,
             'summary' => [
-                'total' => $interviews->count(),
-                'scheduled' => $interviews->where('status', 'scheduled')->count(),
-                'completed' => $interviews->where('status', 'completed')->count(),
+                'total' => Interview::query()->count(),
+                'scheduled' => Interview::query()->where('status', 'scheduled')->count(),
+                'completed' => Interview::query()->where('status', 'completed')->count(),
+            ],
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
             ],
         ]);
     }

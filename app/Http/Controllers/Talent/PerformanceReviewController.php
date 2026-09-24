@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Talent;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\PerformanceReview;
+use App\Support\ListPaginator;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,13 +16,17 @@ class PerformanceReviewController extends Controller
 {
     private const STATUSES = ['draft', 'submitted', 'acknowledged', 'finalized'];
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $reviews = PerformanceReview::query()
-            ->with(['employee:id,full_name,employee_code', 'reviewer:id,name'])
-            ->latest()
-            ->get()
-            ->map(fn (PerformanceReview $review) => [
+        $perPage = ListPaginator::resolvePerPage($request);
+
+        return Inertia::render('Talent/Performance/Index', [
+            'items' => ListPaginator::paginate(
+                PerformanceReview::query()
+                    ->with(['employee:id,full_name,employee_code', 'reviewer:id,name'])
+                    ->latest(),
+                $request,
+            )->through(fn (PerformanceReview $review) => [
                 'id' => $review->id,
                 'employee_id' => $review->employee_id,
                 'employee_name' => $review->employee?->full_name,
@@ -34,17 +39,17 @@ class PerformanceReviewController extends Controller
                 'goals' => $review->goals,
                 'notes' => $review->notes,
                 'status' => $review->status,
-            ]);
-
-        return Inertia::render('Talent/Performance/Index', [
-            'items' => $reviews,
+            ]),
             'employees' => $this->employeeOptions(),
             'reviewers' => User::query()->orderBy('name')->get(['id', 'name']),
             'statuses' => self::STATUSES,
             'summary' => [
-                'total' => $reviews->count(),
-                'finalized' => $reviews->where('status', 'finalized')->count(),
-                'averageRating' => round((float) $reviews->avg(fn ($r) => (float) $r['rating']), 2),
+                'total' => PerformanceReview::query()->count(),
+                'finalized' => PerformanceReview::query()->where('status', 'finalized')->count(),
+                'averageRating' => round((float) PerformanceReview::query()->avg('rating'), 2),
+            ],
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
             ],
         ]);
     }

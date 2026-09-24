@@ -2,6 +2,7 @@ import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { Badge } from '@/Components/ui/badge';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type PlanRow = {
     id: number;
@@ -20,13 +21,15 @@ export default function Index({
     positions,
     employees,
     readinessOptions,
+    filters,
     flash,
 }: PageProps<{
-    items: PlanRow[];
+    items: Paginated<PlanRow>;
     positions: Array<{ id: number; name: string }>;
     employees: Array<{ id: number; name: string }>;
     readinessOptions: string[];
     summary: { total: number; readyNow: number };
+    filters: { per_page: string };
 }>) {
     const { t } = useLanguage();
 
@@ -36,6 +39,8 @@ export default function Index({
             pageTitle={t('succession')}
             addLabel={t('addSuccessionPlan')}
             items={items}
+            filters={filters}
+            indexUrl={route('succession.index')}
             flash={flash}
             columns={[
                 { key: 'position_name', label: t('position') },

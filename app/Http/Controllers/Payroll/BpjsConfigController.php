@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Payroll;
 
 use App\Http\Controllers\Controller;
 use App\Models\BpjsConfig;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -18,12 +19,20 @@ class BpjsConfigController extends Controller
 {
     private const TYPES = ['kesehatan', 'jht', 'jp', 'jkk', 'jkm', 'jkp'];
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = ListPaginator::resolvePerPage($request);
+
         return Inertia::render('Payroll/BpjsConfig/Index', [
-            'items' => BpjsConfig::query()
-                ->orderBy('type')
-                ->get(['id', 'type', 'employee_percentage', 'company_percentage']),
+            'items' => ListPaginator::paginate(
+                BpjsConfig::query()
+                    ->orderBy('type')
+                    ->select(['id', 'type', 'employee_percentage', 'company_percentage']),
+                $request,
+            ),
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
         ]);
     }
 

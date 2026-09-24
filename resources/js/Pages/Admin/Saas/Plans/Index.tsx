@@ -1,6 +1,7 @@
 import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type PlanRow = {
     id: number;
@@ -20,8 +21,9 @@ function formatIdr(value: number) {
 
 export default function Index({
     plans,
+    filters,
     flash,
-}: PageProps<{ plans: PlanRow[] }>) {
+}: PageProps<{ plans: Paginated<PlanRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
 
     return (
@@ -30,6 +32,8 @@ export default function Index({
             pageTitle={t('plans')}
             addLabel={t('addPlan')}
             items={plans}
+            filters={filters}
+            indexUrl={route('admin.saas.plans.index')}
             flash={flash}
             columns={[
                 { key: 'name', label: t('planName') },

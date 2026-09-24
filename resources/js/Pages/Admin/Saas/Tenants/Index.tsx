@@ -2,6 +2,7 @@ import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { Badge } from '@/Components/ui/badge';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type TenantRow = {
     id: number;
@@ -14,8 +15,9 @@ type TenantRow = {
 
 export default function Index({
     tenants,
+    filters,
     flash,
-}: PageProps<{ tenants: TenantRow[] }>) {
+}: PageProps<{ tenants: Paginated<TenantRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
 
     return (
@@ -24,6 +26,8 @@ export default function Index({
             pageTitle={t('tenants')}
             addLabel={t('addTenant')}
             items={tenants}
+            filters={filters}
+            indexUrl={route('admin.saas.tenants.index')}
             flash={flash}
             columns={[
                 { key: 'name', label: t('tenantName') },

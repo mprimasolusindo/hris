@@ -1,13 +1,15 @@
 import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type VendorRow = { id: number; name: string; placement_count: number };
 
 export default function Index({
     vendors,
+    filters,
     flash,
-}: PageProps<{ vendors: VendorRow[] }>) {
+}: PageProps<{ vendors: Paginated<VendorRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
 
     return (
@@ -16,6 +18,8 @@ export default function Index({
             pageTitle={t('vendors')}
             addLabel={t('addVendor')}
             items={vendors}
+            filters={filters}
+            indexUrl={route('vendors.index')}
             flash={flash}
             detailUrl={(id) => route('vendors.show', id)}
             columns={[

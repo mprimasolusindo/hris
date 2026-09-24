@@ -1,6 +1,7 @@
 import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type SiteRow = {
     id: number;
@@ -15,8 +16,13 @@ type CompanyOption = { id: number; name: string };
 export default function Index({
     sites,
     companies,
+    filters,
     flash,
-}: PageProps<{ sites: SiteRow[]; companies: CompanyOption[] }>) {
+}: PageProps<{
+    sites: Paginated<SiteRow>;
+    companies: CompanyOption[];
+    filters: { per_page: string };
+}>) {
     const { t } = useLanguage();
 
     return (
@@ -25,6 +31,8 @@ export default function Index({
             pageTitle={t('sites')}
             addLabel={t('addSite')}
             items={sites}
+            filters={filters}
+            indexUrl={route('organization.sites.index')}
             flash={flash}
             columns={[
                 { key: 'name', label: t('name') },

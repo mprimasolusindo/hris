@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Organization;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Site;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,21 +13,25 @@ use Inertia\Response;
 
 class SiteController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = ListPaginator::resolvePerPage($request);
+
         return Inertia::render('Organization/Sites/Index', [
-            'sites' => Site::query()
-                ->with('company:id,name')
-                ->orderBy('name')
-                ->get()
-                ->map(fn (Site $site) => [
-                    'id' => $site->id,
-                    'name' => $site->name,
-                    'location' => $site->location,
-                    'company_id' => $site->company_id,
-                    'company_name' => $site->company?->name,
-                ]),
+            'sites' => ListPaginator::paginate(
+                Site::query()->with('company:id,name')->orderBy('name'),
+                $request,
+            )->through(fn (Site $site) => [
+                'id' => $site->id,
+                'name' => $site->name,
+                'location' => $site->location,
+                'company_id' => $site->company_id,
+                'company_name' => $site->company?->name,
+            ]),
             'companies' => Company::query()->orderBy('name')->get(['id', 'name']),
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
         ]);
     }
 

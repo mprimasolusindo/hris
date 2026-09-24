@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Payroll;
 
 use App\Http\Controllers\Controller;
 use App\Models\SalaryComponent;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,13 +12,21 @@ use Inertia\Response;
 
 class MasterAllowanceController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = ListPaginator::resolvePerPage($request);
+
         return Inertia::render('Payroll/MasterAllowances/Index', [
-            'items' => SalaryComponent::query()
-                ->where('type', 'earning')
-                ->orderBy('name')
-                ->get(['id', 'name', 'type', 'is_taxable']),
+            'items' => ListPaginator::paginate(
+                SalaryComponent::query()
+                    ->where('type', 'earning')
+                    ->orderBy('name')
+                    ->select(['id', 'name', 'type', 'is_taxable']),
+                $request,
+            ),
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
         ]);
     }
 

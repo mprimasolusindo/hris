@@ -1,13 +1,15 @@
 import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type CompanyRow = { id: number; name: string; type: string };
 
 export default function Index({
     companies,
+    filters,
     flash,
-}: PageProps<{ companies: CompanyRow[] }>) {
+}: PageProps<{ companies: Paginated<CompanyRow>; filters: { per_page: string } }>) {
     const { t } = useLanguage();
 
     return (
@@ -16,6 +18,8 @@ export default function Index({
             pageTitle={t('companies')}
             addLabel={t('addCompany')}
             items={companies}
+            filters={filters}
+            indexUrl={route('organization.companies.index')}
             flash={flash}
             columns={[
                 { key: 'name', label: t('name') },

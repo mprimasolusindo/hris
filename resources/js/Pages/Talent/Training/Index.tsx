@@ -2,6 +2,7 @@ import MasterCrudPage from '@/Components/master/MasterCrudPage';
 import { Badge } from '@/Components/ui/badge';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
 
 type TrainingRow = {
     id: number;
@@ -17,11 +18,13 @@ type TrainingRow = {
 export default function Index({
     items,
     statuses,
+    filters,
     flash,
 }: PageProps<{
-    items: TrainingRow[];
+    items: Paginated<TrainingRow>;
     statuses: string[];
     summary: { total: number; ongoing: number; completed: number };
+    filters: { per_page: string };
 }>) {
     const { t } = useLanguage();
 
@@ -38,6 +41,8 @@ export default function Index({
             pageTitle={t('training')}
             addLabel={t('addTraining')}
             items={items}
+            filters={filters}
+            indexUrl={route('training.index')}
             flash={flash}
             detailUrl={(id) => route('training.show', id)}
             columns={[

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Talent;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Training;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,13 +17,15 @@ class TrainingController extends Controller
 
     private const ENROLLMENT_STATUSES = ['registered', 'attended', 'completed', 'dropped'];
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $trainings = Training::query()
-            ->withCount('employees')
-            ->latest('start_date')
-            ->get()
-            ->map(fn (Training $training) => [
+        $perPage = ListPaginator::resolvePerPage($request);
+
+        return Inertia::render('Talent/Training/Index', [
+            'items' => ListPaginator::paginate(
+                Training::query()->withCount('employees')->latest('start_date'),
+                $request,
+            )->through(fn (Training $training) => [
                 'id' => $training->id,
                 'name' => $training->name,
                 'description' => $training->description,
@@ -31,15 +34,15 @@ class TrainingController extends Controller
                 'location' => $training->location,
                 'status' => $training->status,
                 'participants' => $training->employees_count,
-            ]);
-
-        return Inertia::render('Talent/Training/Index', [
-            'items' => $trainings,
+            ]),
             'statuses' => self::STATUSES,
             'summary' => [
-                'total' => $trainings->count(),
-                'ongoing' => $trainings->where('status', 'ongoing')->count(),
-                'completed' => $trainings->where('status', 'completed')->count(),
+                'total' => Training::query()->count(),
+                'ongoing' => Training::query()->where('status', 'ongoing')->count(),
+                'completed' => Training::query()->where('status', 'completed')->count(),
+            ],
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
             ],
         ]);
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Organization;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,12 +12,18 @@ use Inertia\Response;
 
 class CompanyController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = ListPaginator::resolvePerPage($request);
+
         return Inertia::render('Organization/Companies/Index', [
-            'companies' => Company::query()
-                ->orderBy('name')
-                ->get(['id', 'name', 'type']),
+            'companies' => ListPaginator::paginate(
+                Company::query()->orderBy('name')->select(['id', 'name', 'type']),
+                $request,
+            ),
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
         ]);
     }
 

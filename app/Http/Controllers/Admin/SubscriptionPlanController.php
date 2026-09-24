@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SubscriptionPlan;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,20 +12,24 @@ use Inertia\Response;
 
 class SubscriptionPlanController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = ListPaginator::resolvePerPage($request);
+
         return Inertia::render('Admin/Saas/Plans/Index', [
-            'plans' => SubscriptionPlan::query()
-                ->withCount('subscriptions')
-                ->orderBy('price')
-                ->get()
-                ->map(fn (SubscriptionPlan $plan) => [
-                    'id' => $plan->id,
-                    'name' => $plan->name,
-                    'price' => (float) $plan->price,
-                    'employee_limit' => $plan->employee_limit,
-                    'subscriptions_count' => $plan->subscriptions_count,
-                ]),
+            'plans' => ListPaginator::paginate(
+                SubscriptionPlan::query()->withCount('subscriptions')->orderBy('price'),
+                $request,
+            )->through(fn (SubscriptionPlan $plan) => [
+                'id' => $plan->id,
+                'name' => $plan->name,
+                'price' => (float) $plan->price,
+                'employee_limit' => $plan->employee_limit,
+                'subscriptions_count' => $plan->subscriptions_count,
+            ]),
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
         ]);
     }
 

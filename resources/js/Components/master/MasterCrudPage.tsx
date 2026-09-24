@@ -31,6 +31,9 @@ import {
 } from '@/Components/ui/select';
 import { Link } from '@inertiajs/react';
 import { Eye, Plus, Pencil, Trash2 } from 'lucide-react';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
+import type { Paginated } from '@/types/pagination';
 import { FormEventHandler, ReactNode, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -63,7 +66,9 @@ type MasterCrudPageProps<T extends { id: number }> = {
     title: string;
     pageTitle: string;
     addLabel: string;
-    items: T[];
+    items: Paginated<T>;
+    filters: { per_page: string } & Record<string, string | number>;
+    indexUrl: string;
     columns: CrudColumn<T>[];
     fields: CrudField[];
     initialForm: Record<string, string | boolean>;
@@ -81,6 +86,8 @@ export default function MasterCrudPage<T extends { id: number }>({
     pageTitle,
     addLabel,
     items,
+    filters,
+    indexUrl,
     columns,
     fields,
     initialForm,
@@ -93,6 +100,7 @@ export default function MasterCrudPage<T extends { id: number }>({
     detailUrl,
 }: MasterCrudPageProps<T>) {
     const { t } = useLanguage();
+    const rows = items.data;
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
 
@@ -295,7 +303,7 @@ export default function MasterCrudPage<T extends { id: number }>({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {items.length === 0 ? (
+                                {rows.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             colSpan={columns.length + 1}
@@ -305,7 +313,7 @@ export default function MasterCrudPage<T extends { id: number }>({
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    items.map((row) => (
+                                    rows.map((row) => (
                                         <TableRow key={row.id}>
                                             {columns.map((col) => (
                                                 <TableCell key={String(col.key)}>
@@ -356,6 +364,20 @@ export default function MasterCrudPage<T extends { id: number }>({
                         </Table>
                     </CardContent>
                 </Card>
+
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(
+                                indexUrl,
+                                { ...filters, per_page: v, page: 1 },
+                                { preserveScroll: true },
+                            )
+                        }
+                    />
+                    <TablePagination paginator={items} />
+                </div>
             </div>
         </HrisLayout>
     );

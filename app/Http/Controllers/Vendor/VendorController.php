@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,21 +12,25 @@ use Inertia\Response;
 
 class VendorController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $vendors = Company::query()
-            ->where('type', 'vendor')
-            ->withCount('vendorEmployees')
-            ->orderBy('name')
-            ->get()
-            ->map(fn (Company $vendor) => [
+        $perPage = ListPaginator::resolvePerPage($request);
+
+        return Inertia::render('Vendors/Index', [
+            'vendors' => ListPaginator::paginate(
+                Company::query()
+                    ->where('type', 'vendor')
+                    ->withCount('vendorEmployees')
+                    ->orderBy('name'),
+                $request,
+            )->through(fn (Company $vendor) => [
                 'id' => $vendor->id,
                 'name' => $vendor->name,
                 'placement_count' => $vendor->vendor_employees_count,
-            ]);
-
-        return Inertia::render('Vendors/Index', [
-            'vendors' => $vendors,
+            ]),
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
         ]);
     }
 

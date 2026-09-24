@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WorkSchedule;
 
 use App\Http\Controllers\Controller;
 use App\Models\Holiday;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -15,18 +16,22 @@ class HolidayController extends Controller
     public function index(Request $request): Response
     {
         $year = (int) $request->input('year', now()->year);
+        $perPage = ListPaginator::resolvePerPage($request);
 
         return Inertia::render('Holidays/Index', [
             'year' => $year,
-            'holidays' => Holiday::query()
-                ->whereYear('holiday_date', $year)
-                ->orderByDesc('holiday_date')
-                ->get()
-                ->map(fn (Holiday $holiday) => $this->serialize($holiday)),
+            'holidays' => ListPaginator::paginate(
+                Holiday::query()->whereYear('holiday_date', $year)->orderByDesc('holiday_date'),
+                $request,
+            )->through(fn (Holiday $holiday) => $this->serialize($holiday)),
             'typeOptions' => [
                 ['value' => 'national', 'label' => 'National'],
                 ['value' => 'company', 'label' => 'Company'],
                 ['value' => 'joint_leave', 'label' => 'Joint leave (cuti bersama)'],
+            ],
+            'filters' => [
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+                'year' => $year,
             ],
         ]);
     }
