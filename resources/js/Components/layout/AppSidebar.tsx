@@ -460,13 +460,12 @@ export function AppSidebar() {
 
     const renderLeaf = (item: NavLeaf) => (
         <SidebarMenuItem key={item.href}>
-            <SidebarMenuButton asChild tooltip={item.title}>
-                <NavLink
-                    href={item.href}
-                    className="hover:bg-white/30"
-                    active={isActive(item.href)}
-                    activeClassName="bg-white/40 text-sidebar-foreground font-medium backdrop-blur-sm"
-                >
+            <SidebarMenuButton
+                asChild
+                tooltip={item.title}
+                isActive={isActive(item.href)}
+            >
+                <NavLink href={item.href}>
                     <item.icon className="h-4 w-4" />
                     {!collapsed && <span className="flex-1">{item.title}</span>}
                     {!collapsed && renderBadge(item.badge ?? 0)}
@@ -496,7 +495,7 @@ export function AppSidebar() {
                     <CollapsibleTrigger asChild>
                         <SidebarMenuButton
                             tooltip={node.title}
-                            isActive={activeChild || isOpen}
+                            isActive={activeChild}
                         >
                             <node.icon className="h-4 w-4" />
                             {!collapsed && (
@@ -516,12 +515,7 @@ export function AppSidebar() {
                                         asChild
                                         isActive={isActive(child.href)}
                                     >
-                                        <NavLink
-                                            href={child.href}
-                                            className="hover:bg-white/30"
-                                            active={isActive(child.href)}
-                                            activeClassName="bg-white/40 text-sidebar-foreground font-medium backdrop-blur-sm"
-                                        >
+                                        <NavLink href={child.href}>
                                             <span className="flex-1">
                                                 {child.title}
                                             </span>
