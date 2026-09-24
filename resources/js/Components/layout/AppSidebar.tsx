@@ -463,9 +463,9 @@ export function AppSidebar() {
             <SidebarMenuButton asChild tooltip={item.title}>
                 <NavLink
                     href={item.href}
-                    className="hover:bg-white/30"
+                    className="hover:bg-white/25"
                     active={isActive(item.href)}
-                    activeClassName="bg-white/40 text-sidebar-foreground font-medium backdrop-blur-sm"
+                    activeClassName="bg-white/55 text-sidebar-foreground font-medium backdrop-blur-md shadow-sm"
                 >
                     <item.icon className="h-4 w-4" />
                     {!collapsed && <span className="flex-1">{item.title}</span>}
@@ -496,7 +496,7 @@ export function AppSidebar() {
                     <CollapsibleTrigger asChild>
                         <SidebarMenuButton
                             tooltip={node.title}
-                            isActive={activeChild || isOpen}
+                            isActive={activeChild}
                         >
                             <node.icon className="h-4 w-4" />
                             {!collapsed && (
@@ -518,9 +518,9 @@ export function AppSidebar() {
                                     >
                                         <NavLink
                                             href={child.href}
-                                            className="hover:bg-white/30"
+                                            className="hover:bg-white/25"
                                             active={isActive(child.href)}
-                                            activeClassName="bg-white/40 text-sidebar-foreground font-medium backdrop-blur-sm"
+                                            activeClassName="bg-white/55 text-sidebar-foreground font-medium backdrop-blur-md shadow-sm"
                                         >
                                             <span className="flex-1">
                                                 {child.title}
