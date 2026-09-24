@@ -463,9 +463,9 @@ export function AppSidebar() {
             <SidebarMenuButton asChild tooltip={item.title}>
                 <NavLink
                     href={item.href}
-                    className="hover:bg-sidebar-accent/50"
+                    className="hover:bg-white/30"
                     active={isActive(item.href)}
-                    activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    activeClassName="bg-white/40 text-sidebar-foreground font-medium backdrop-blur-sm"
                 >
                     <item.icon className="h-4 w-4" />
                     {!collapsed && <span className="flex-1">{item.title}</span>}
@@ -518,9 +518,9 @@ export function AppSidebar() {
                                     >
                                         <NavLink
                                             href={child.href}
-                                            className="hover:bg-sidebar-accent/50"
+                                            className="hover:bg-white/30"
                                             active={isActive(child.href)}
-                                            activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                                            activeClassName="bg-white/40 text-sidebar-foreground font-medium backdrop-blur-sm"
                                         >
                                             <span className="flex-1">
                                                 {child.title}

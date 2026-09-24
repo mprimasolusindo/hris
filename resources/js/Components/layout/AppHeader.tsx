@@ -67,7 +67,7 @@ export function AppHeader() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                     placeholder={t('search')}
-                    className="h-9 border-0 bg-muted/50 pl-8"
+                    className="h-9 pl-8"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
