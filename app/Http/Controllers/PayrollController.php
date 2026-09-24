@@ -50,7 +50,7 @@ class PayrollController extends Controller
         $summaryStats = (clone $query)
             ->selectRaw("
                 SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as draft,
-                SUM(CASE WHEN status IN ('generated', 'reviewed', 'approved') THEN 1 ELSE 0 END) as generated,
+                SUM(CASE WHEN status IN ('generated', 'reviewed', 'approved') THEN 1 ELSE 0 END) as generated_count,
                 SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) as paid,
                 COALESCE(SUM(net_salary), 0) as total_amount
             ")
@@ -58,7 +58,7 @@ class PayrollController extends Controller
 
         $summary = [
             'draft' => (int) $summaryStats->draft,
-            'generated' => (int) $summaryStats->generated,
+            'generated' => (int) $summaryStats->generated_count,
             'paid' => (int) $summaryStats->paid,
             'total_amount' => (float) $summaryStats->total_amount,
         ];
