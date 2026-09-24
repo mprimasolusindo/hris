@@ -46,10 +46,17 @@ jobs:
           "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" \
             "if [[ ! -d '${DEPLOY_PATH}' ]]; then echo \"ERROR: ${DEPLOY_PATH} does not exist. Create it in Plesk (or ask your host) before deploying.\"; exit 1; fi; if [[ ! -w '${DEPLOY_PATH}' ]]; then echo \"ERROR: ${DEPLOY_PATH} is not writable by ${USER}.\"; exit 1; fi"
 
+          # tar extract does not delete removed files. Wipe frontend sources first so
+          # renamed/deleted pages (e.g. Master/AllowanceTypes) cannot break tsc on the server.
+          "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" \
+            "cd '${DEPLOY_PATH}' && rm -rf resources/js && mkdir -p resources/js"
+
           tar czf - \
             --exclude='./.git' \
             --exclude='./.github' \
             --exclude='./.specstory' \
+            --exclude='./.superpowers' \
+            --exclude='./.worktrees' \
             --exclude='./node_modules' \
             --exclude='./vendor' \
             --exclude='./.env' \
@@ -94,10 +101,16 @@ jobs:
             exit 1
           fi
 
+          echo "==> composer install"
           "${REMOTE_PHP}" "${COMPOSER_BIN}" install --no-dev --optimize-autoloader --no-interaction
+
+          echo "==> npm ci"
           "${REMOTE_NPM}" ci
+
+          echo "==> npm run build"
           "${REMOTE_NPM}" run build
 
+          echo "==> storage dirs + artisan optimize"
           mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
           chmod -R ug+rwx storage bootstrap/cache
 
