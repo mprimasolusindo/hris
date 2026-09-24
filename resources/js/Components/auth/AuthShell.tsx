@@ -21,8 +21,9 @@ export default function AuthShell({ title, description, children }: AuthShellPro
     const { language, setLanguage } = useLanguage();
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
-            <div className="absolute right-4 top-4">
+        <div className="relative flex min-h-screen items-center justify-center px-4">
+            <div className="app-atmosphere" aria-hidden />
+            <div className="absolute right-4 top-4 z-10">
                 <Button
                     variant="ghost"
                     size="sm"
@@ -33,7 +34,7 @@ export default function AuthShell({ title, description, children }: AuthShellPro
                 </Button>
             </div>
 
-            <Card className="w-full max-w-md shadow-lg">
+            <Card className="relative z-10 w-full max-w-md">
                 <CardHeader className="space-y-2 text-center">
                     <div className="mx-auto flex items-center justify-center gap-2">
                         <Building2 className="h-8 w-8 text-primary" />
