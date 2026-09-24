@@ -6,15 +6,16 @@ import BugReportWidget from '@/Features/BugReport/BugReportWidget';
 
 export default function HrisLayout({ children }: PropsWithChildren) {
     return (
-        <SidebarProvider>
-            <div className="flex min-h-screen w-full">
+        <>
+            <div className="app-atmosphere" aria-hidden="true" />
+            <SidebarProvider className="relative z-[1] bg-transparent">
                 <AppSidebar />
-                <div className="flex flex-1 flex-col">
+                <div className="flex min-h-svh flex-1 flex-col">
                     <AppHeader />
-                    <main className="flex-1 bg-muted/30 p-6">{children}</main>
+                    <main className="flex-1 bg-transparent p-6">{children}</main>
                 </div>
-            </div>
+            </SidebarProvider>
             <BugReportWidget />
-        </SidebarProvider>
+        </>
     );
 }

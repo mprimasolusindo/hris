@@ -60,7 +60,7 @@ export function AppHeader() {
         (reminders?.openComplianceFlagsCount || 0);
 
     return (
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4">
+        <header className="glass-chrome sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-[hsl(214_32%_91%_/_0.65)] px-4">
             <SidebarTrigger className="shrink-0" />
 
             <form onSubmit={submitSearch} className="relative max-w-sm flex-1">

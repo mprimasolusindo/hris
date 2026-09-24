@@ -6,14 +6,19 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
-    --card: 0 0% 100%;
+    --card: 210 40% 99%;
     --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 0 0% 100%;
+    --popover: 210 40% 99%;
     --popover-foreground: 222.2 84% 4.9%;
+
+    --glass-bg: 0 0% 100% / 0.55;
+    --glass-border: 214 32% 91% / 0.65;
+    --glass-blur: 20px;
+    --glass-shadow: 0 8px 32px hsl(215 25% 27% / 0.08);
 
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
@@ -34,9 +39,9 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 210 40% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
@@ -92,6 +97,36 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    background: hsl(0 0% 100% / 0.55);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    border: 1px solid hsl(0 0% 100% / 0.45);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-chrome {
+    background: hsl(0 0% 100% / 0.72);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    border-color: hsl(var(--glass-border));
+  }
+
+  .app-atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(ellipse 85% 65% at 8% 18%, hsl(210 45% 94% / 0.95), transparent 58%),
+      radial-gradient(ellipse 75% 55% at 92% 8%, hsl(215 38% 92% / 0.9), transparent 52%),
+      radial-gradient(ellipse 65% 70% at 48% 100%, hsl(205 42% 93% / 0.85), transparent 58%),
+      radial-gradient(ellipse 55% 45% at 72% 55%, hsl(212 32% 95% / 0.75), transparent 48%);
   }
 }
 
