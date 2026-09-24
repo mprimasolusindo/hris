@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Leave;
 use App\Models\LeaveType;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -77,20 +78,22 @@ class LeaveController extends Controller
         $selfOnly = self::isSelfServiceOnly();
         $currentEmployeeId = self::currentEmployeeId();
 
-        $leaves = Leave::query()
-            ->with('employee:id,full_name,employee_code')
-            ->when($selfOnly, function ($q) use ($currentEmployeeId) {
-                if ($currentEmployeeId === null) {
-                    $q->whereRaw('0 = 1');
-                } else {
-                    $q->where('employee_id', $currentEmployeeId);
-                }
-            })
-            ->when($status !== '', fn ($q) => $q->where('status', $status))
-            ->when($type !== '', fn ($q) => $q->where('type', $type))
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+        $perPage = ListPaginator::resolvePerPage($request);
+        $leaves = ListPaginator::paginate(
+            Leave::query()
+                ->with('employee:id,full_name,employee_code')
+                ->when($selfOnly, function ($q) use ($currentEmployeeId) {
+                    if ($currentEmployeeId === null) {
+                        $q->whereRaw('0 = 1');
+                    } else {
+                        $q->where('employee_id', $currentEmployeeId);
+                    }
+                })
+                ->when($status !== '', fn ($q) => $q->where('status', $status))
+                ->when($type !== '', fn ($q) => $q->where('type', $type))
+                ->latest(),
+            $request,
+        );
 
         $leaves->getCollection()->transform(fn (Leave $leave) => $this->serializeLeave($leave));
 
@@ -112,7 +115,11 @@ class LeaveController extends Controller
 
         return Inertia::render('Leave/Index', [
             'leaves' => $leaves,
-            'filters' => ['status' => $status, 'type' => $type],
+            'filters' => [
+                'status' => $status,
+                'type' => $type,
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
             'typeOptions' => self::typeCodes(),
             'employees' => $employees->values(),
             'selfService' => $selfOnly,

@@ -7,6 +7,7 @@ use App\Models\Overtime;
 use App\Models\Payroll;
 use App\Models\Site;
 use App\Services\Payroll\PayrollCalculationService;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
@@ -62,7 +63,8 @@ class PayrollController extends Controller
             'total_amount' => (float) $summaryStats->total_amount,
         ];
 
-        $payrolls = $query->latest()->paginate(20)->withQueryString();
+        $perPage = ListPaginator::resolvePerPage($request);
+        $payrolls = ListPaginator::paginate($query->latest(), $request);
 
         $payrolls->getCollection()->transform(function (Payroll $payroll) {
             return [
@@ -89,6 +91,7 @@ class PayrollController extends Controller
                 'company_id' => $companyId ? (string) $companyId : '',
                 'site_id' => $siteId ? (string) $siteId : '',
                 'status' => $status,
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
             ],
             'summary' => $summary,
             'employees' => Employee::query()->orderBy('full_name')->get(['id', 'full_name', 'employee_code']),

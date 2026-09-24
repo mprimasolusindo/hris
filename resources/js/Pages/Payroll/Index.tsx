@@ -23,6 +23,9 @@ import {
     SelectValue,
 } from '@/Components/ui/select';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -40,13 +43,6 @@ type PayrollRow = {
     status: string;
 };
 
-type PaginatedPayrolls = {
-    data: PayrollRow[];
-    links: Array<{ url: string | null; label: string; active: boolean }>;
-    current_page: number;
-    last_page: number;
-};
-
 export default function Index({
     payrolls,
     filters,
@@ -56,8 +52,8 @@ export default function Index({
     sites,
     flash,
 }: PageProps<{
-    payrolls: PaginatedPayrolls;
-    filters: Record<string, string | number>;
+    payrolls: Paginated<PayrollRow>;
+    filters: Record<string, string | number> & { per_page: string };
     summary: Record<string, number>;
     employees: Array<{ id: number; full_name: string; employee_code: string }>;
     companies: Array<{ id: number; name: string }>;
@@ -434,28 +430,15 @@ export default function Index({
                     </CardContent>
                 </Card>
 
-                {payrolls.last_page > 1 && (
-                    <div className="flex flex-wrap gap-2">
-                        {payrolls.links.map((link, i) =>
-                            link.url ? (
-                                <Button
-                                    key={i}
-                                    variant={link.active ? 'default' : 'outline'}
-                                    size="sm"
-                                    asChild
-                                >
-                                    <Link href={link.url} preserveScroll>
-                                        <span
-                                            dangerouslySetInnerHTML={{
-                                                __html: link.label,
-                                            }}
-                                        />
-                                    </Link>
-                                </Button>
-                            ) : null,
-                        )}
-                    </div>
-                )}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={String(filters.per_page ?? '20')}
+                        onChange={(v) =>
+                            applyFilters({ per_page: v, page: 1 })
+                        }
+                    />
+                    <TablePagination paginator={payrolls} />
+                </div>
             </div>
         </HrisLayout>
     );

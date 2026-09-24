@@ -16,6 +16,9 @@ import {
 import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { toast } from 'sonner';
 import { useCan } from '@/hooks/useCan';
 
@@ -27,20 +30,13 @@ type UserRow = {
     created_at: string | null;
 };
 
-type PaginatedUsers = {
-    data: UserRow[];
-    links: Array<{ url: string | null; label: string; active: boolean }>;
-    current_page: number;
-    last_page: number;
-};
-
 export default function Index({
     users,
     filters,
     flash,
 }: PageProps<{
-    users: PaginatedUsers;
-    filters: { search: string };
+    users: Paginated<UserRow>;
+    filters: { search: string; per_page: string };
 }>) {
     const { t } = useLanguage();
     const { can } = useCan();
@@ -56,7 +52,7 @@ export default function Index({
         e?.preventDefault();
         router.get(
             route('admin.users.index'),
-            { search: search || undefined },
+            { search: search || undefined, per_page: filters.per_page },
             { preserveState: true, replace: true },
         );
     };
@@ -186,29 +182,23 @@ export default function Index({
                             </TableBody>
                         </Table>
 
-                        {users.last_page > 1 && (
-                            <div className="mt-4 flex flex-wrap gap-2">
-                                {users.links.map((link, index) => (
-                                    <Button
-                                        key={index}
-                                        variant={
-                                            link.active ? 'default' : 'outline'
-                                        }
-                                        size="sm"
-                                        disabled={!link.url}
-                                        onClick={() =>
-                                            link.url &&
-                                            router.get(link.url, {}, {
-                                                preserveState: true,
-                                            })
-                                        }
-                                        dangerouslySetInnerHTML={{
-                                            __html: link.label,
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        )}
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+                            <PerPageSelect
+                                value={filters.per_page}
+                                onChange={(v) =>
+                                    router.get(
+                                        route('admin.users.index'),
+                                        {
+                                            search: filters.search || undefined,
+                                            per_page: v,
+                                            page: 1,
+                                        },
+                                        { preserveScroll: true },
+                                    )
+                                }
+                            />
+                            <TablePagination paginator={users} />
+                        </div>
                     </CardContent>
                 </Card>
             </div>

@@ -3,33 +3,35 @@
 namespace App\Services\Employee;
 
 use App\Models\Employee;
+use App\Support\ListPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class EmployeeQueryService
 {
-    public function paginate(Request $request, int $perPage = 15): LengthAwarePaginator
+    public function paginate(Request $request): LengthAwarePaginator
     {
         $search = (string) $request->query('search', '');
         $status = (string) $request->query('status', '');
 
-        return Employee::query()
-            ->with([
-                'company',
-                'user:id,name,email',
-                'jobs' => fn ($q) => $q->with(['department', 'position'])->orderByDesc('start_date'),
-                'siteAssignments' => fn ($q) => $q->with('site')->orderByDesc('start_date'),
-            ])
-            ->when($search !== '', function ($query) use ($search) {
-                $query->where(function ($inner) use ($search) {
-                    $inner->where('full_name', 'like', "%{$search}%")
-                        ->orWhere('employee_code', 'like', "%{$search}%");
-                });
-            })
-            ->when($status !== '', fn ($query) => $query->where('status', $status))
-            ->latest()
-            ->paginate($perPage)
-            ->withQueryString();
+        return ListPaginator::paginate(
+            Employee::query()
+                ->with([
+                    'company',
+                    'user:id,name,email',
+                    'jobs' => fn ($q) => $q->with(['department', 'position'])->orderByDesc('start_date'),
+                    'siteAssignments' => fn ($q) => $q->with('site')->orderByDesc('start_date'),
+                ])
+                ->when($search !== '', function ($query) use ($search) {
+                    $query->where(function ($inner) use ($search) {
+                        $inner->where('full_name', 'like', "%{$search}%")
+                            ->orWhere('employee_code', 'like', "%{$search}%");
+                    });
+                })
+                ->when($status !== '', fn ($query) => $query->where('status', $status))
+                ->latest(),
+            $request,
+        );
     }
 
     public function loadForShow(Employee $employee): Employee

@@ -30,6 +30,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -69,8 +72,8 @@ export default function Index({
     canCancel = true,
     flash,
 }: PageProps<{
-    leaves: { data: LeaveRow[]; links: unknown[] };
-    filters: { status: string; type: string };
+    leaves: Paginated<LeaveRow>;
+    filters: { status: string; type: string; per_page: string };
     typeOptions: string[];
     employees: Array<{ id: number; full_name: string; employee_code: string }>;
     selfService?: boolean;
@@ -373,6 +376,20 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(
+                                route('leave.index'),
+                                { ...filters, per_page: v, page: 1 },
+                                { preserveScroll: true },
+                            )
+                        }
+                    />
+                    <TablePagination paginator={leaves} />
+                </div>
             </div>
         </HrisLayout>
     );

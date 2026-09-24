@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\SuperAdminGuard;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,33 +22,39 @@ class UserController extends Controller
         $this->authorize('users.view');
 
         $search = (string) $request->query('search', '');
+        $perPage = ListPaginator::resolvePerPage($request);
 
-        $users = User::query()
-            ->with('roles:id,name,slug')
-            ->when($search !== '', function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('name')
-            ->paginate(15)
-            ->withQueryString()
-            ->through(fn (User $user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'roles' => $user->roles->map(fn (Role $role) => [
-                    'id' => $role->id,
-                    'name' => $role->name,
-                    'slug' => $role->slug,
-                ])->values()->all(),
-                'created_at' => $user->created_at?->toDateTimeString(),
-            ]);
+        $users = ListPaginator::paginate(
+            User::query()
+                ->with('roles:id,name,slug')
+                ->when($search !== '', function ($query) use ($search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+                })
+                ->orderBy('name'),
+            $request,
+        );
+
+        $users->getCollection()->transform(fn (User $user) => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->map(fn (Role $role) => [
+                'id' => $role->id,
+                'name' => $role->name,
+                'slug' => $role->slug,
+            ])->values()->all(),
+            'created_at' => $user->created_at?->toDateTimeString(),
+        ]);
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
-            'filters' => ['search' => $search],
+            'filters' => [
+                'search' => $search,
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
+            ],
         ]);
     }
 

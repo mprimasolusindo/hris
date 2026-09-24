@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Overtime;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Overtime;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,13 +20,15 @@ class OvertimeController extends Controller
         $status = (string) $request->query('status', '');
         $employeeId = $request->query('employee_id');
 
-        $overtimes = Overtime::query()
-            ->with(['employee:id,full_name,employee_code', 'approver:id,full_name'])
-            ->when($status !== '', fn ($q) => $q->where('status', $status))
-            ->when($employeeId, fn ($q) => $q->where('employee_id', $employeeId))
-            ->orderByDesc('date')
-            ->paginate(20)
-            ->withQueryString();
+        $perPage = ListPaginator::resolvePerPage($request);
+        $overtimes = ListPaginator::paginate(
+            Overtime::query()
+                ->with(['employee:id,full_name,employee_code', 'approver:id,full_name'])
+                ->when($status !== '', fn ($q) => $q->where('status', $status))
+                ->when($employeeId, fn ($q) => $q->where('employee_id', $employeeId))
+                ->orderByDesc('date'),
+            $request,
+        );
 
         $overtimes->getCollection()->transform(fn (Overtime $row) => $this->serialize($row));
 
@@ -40,6 +43,7 @@ class OvertimeController extends Controller
             'filters' => [
                 'status' => $status,
                 'employee_id' => $employeeId ? (string) $employeeId : '',
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
             ],
             'summary' => $summary,
             'statusOptions' => self::STATUSES,

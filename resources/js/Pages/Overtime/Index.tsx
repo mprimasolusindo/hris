@@ -29,6 +29,9 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Check, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -58,8 +61,8 @@ export default function Index({
     employees,
     flash,
 }: PageProps<{
-    overtimes: { data: OvertimeRow[] };
-    filters: { status: string; employee_id: string };
+    overtimes: Paginated<OvertimeRow>;
+    filters: { status: string; employee_id: string; per_page: string };
     summary: { pending: number; approved: number; rejected: number };
     statusOptions: string[];
     employees: Array<{ id: number; full_name: string; employee_code: string }>;
@@ -314,6 +317,20 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(
+                                route('overtime.index'),
+                                { ...filters, per_page: v, page: 1 },
+                                { preserveScroll: true },
+                            )
+                        }
+                    />
+                    <TablePagination paginator={overtimes} />
+                </div>
             </div>
         </HrisLayout>
     );

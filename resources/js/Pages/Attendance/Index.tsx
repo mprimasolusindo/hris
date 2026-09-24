@@ -29,6 +29,9 @@ import {
     SelectValue,
 } from '@/Components/ui/select';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -58,8 +61,8 @@ export default function Index({
     statusOptions,
     flash,
 }: PageProps<{
-    attendances: { data: AttendanceRow[] };
-    filters: { date: string; site_id: string; employee_id: string };
+    attendances: Paginated<AttendanceRow>;
+    filters: { date: string; site_id: string; employee_id: string; per_page: string };
     summary: { present: number; late: number; absent: number };
     employees: Array<{ id: number; full_name: string; employee_code: string }>;
     sites: Array<{ id: number; name: string }>;
@@ -134,6 +137,7 @@ export default function Index({
             date: next.date,
             site_id: next.site_id || undefined,
             employee_id: next.employee_id || undefined,
+            per_page: next.per_page,
         });
     };
 
@@ -370,6 +374,26 @@ export default function Index({
                         </Table>
                     </CardContent>
                 </Card>
+
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(
+                                route('attendance.index'),
+                                {
+                                    date: filters.date,
+                                    site_id: filters.site_id || undefined,
+                                    employee_id: filters.employee_id || undefined,
+                                    per_page: v,
+                                    page: 1,
+                                },
+                                { preserveScroll: true },
+                            )
+                        }
+                    />
+                    <TablePagination paginator={attendances} />
+                </div>
             </div>
 
             <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>

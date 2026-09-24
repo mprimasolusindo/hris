@@ -23,6 +23,9 @@ import {
 import { Plus, Search, Eye } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { PageProps } from '@/types';
+import type { Paginated } from '@/types/pagination';
+import { PerPageSelect } from '@/Components/table/PerPageSelect';
+import { TablePagination } from '@/Components/table/TablePagination';
 import { toast } from 'sonner';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { EmployeeBulkActions } from '@/Features/employees/components/EmployeeBulkActions';
@@ -38,20 +41,13 @@ type EmployeeRow = {
     join_date: string | null;
 };
 
-type PaginatedEmployees = {
-    data: EmployeeRow[];
-    links: Array<{ url: string | null; label: string; active: boolean }>;
-    current_page: number;
-    last_page: number;
-};
-
 export default function Index({
     employees,
     filters,
     flash,
 }: PageProps<{
-    employees: PaginatedEmployees;
-    filters: { search: string; status: string };
+    employees: Paginated<EmployeeRow>;
+    filters: { search: string; status: string; per_page: string };
 }>) {
     const { t } = useLanguage();
     const [search, setSearch] = useState(filters.search || '');
@@ -76,6 +72,7 @@ export default function Index({
             {
                 search: nextSearch || undefined,
                 status: nextStatus === 'all' ? undefined : nextStatus,
+                per_page: filters.per_page,
             },
             { preserveState: true, replace: true },
         );
@@ -254,28 +251,24 @@ export default function Index({
                     </CardContent>
                 </Card>
 
-                {employees.last_page > 1 && (
-                    <div className="flex flex-wrap gap-2">
-                        {employees.links.map((link, i) =>
-                            link.url ? (
-                                <Button
-                                    key={i}
-                                    variant={link.active ? 'default' : 'outline'}
-                                    size="sm"
-                                    asChild
-                                >
-                                    <Link href={link.url} preserveScroll>
-                                        <span
-                                            dangerouslySetInnerHTML={{
-                                                __html: link.label,
-                                            }}
-                                        />
-                                    </Link>
-                                </Button>
-                            ) : null,
-                        )}
-                    </div>
-                )}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <PerPageSelect
+                        value={filters.per_page}
+                        onChange={(v) =>
+                            router.get(
+                                route('employees.index'),
+                                {
+                                    search: filters.search || undefined,
+                                    status: filters.status || undefined,
+                                    per_page: v,
+                                    page: 1,
+                                },
+                                { preserveScroll: true },
+                            )
+                        }
+                    />
+                    <TablePagination paginator={employees} />
+                </div>
             </div>
         </HrisLayout>
     );

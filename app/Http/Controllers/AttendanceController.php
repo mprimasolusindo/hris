@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Payroll;
 use App\Models\Site;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,14 +20,16 @@ class AttendanceController extends Controller
         $siteId = $request->query('site_id');
         $employeeId = $request->query('employee_id');
 
-        $attendances = Attendance::query()
-            ->with(['employee', 'site'])
-            ->whereDate('clock_in', $date)
-            ->when($siteId, fn ($query) => $query->where('site_id', $siteId))
-            ->when($employeeId, fn ($query) => $query->where('employee_id', $employeeId))
-            ->orderBy('clock_in')
-            ->paginate(20)
-            ->withQueryString();
+        $perPage = ListPaginator::resolvePerPage($request);
+        $attendances = ListPaginator::paginate(
+            Attendance::query()
+                ->with(['employee', 'site'])
+                ->whereDate('clock_in', $date)
+                ->when($siteId, fn ($query) => $query->where('site_id', $siteId))
+                ->when($employeeId, fn ($query) => $query->where('employee_id', $employeeId))
+                ->orderBy('clock_in'),
+            $request,
+        );
 
         $collection = $attendances->getCollection();
 
@@ -55,6 +58,7 @@ class AttendanceController extends Controller
                 'date' => $date,
                 'site_id' => $siteId ? (string) $siteId : '',
                 'employee_id' => $employeeId ? (string) $employeeId : '',
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
             ],
             'summary' => $summary,
             'employees' => Employee::query()->orderBy('full_name')->get(['id', 'full_name', 'employee_code']),

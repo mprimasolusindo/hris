@@ -93,8 +93,14 @@ class PhaseOneFlowTest extends TestCase
             'status' => 'present',
         ]);
 
-        $listResponse = $this->get(route('attendance.index', ['date' => now()->toDateString()]));
+        $listResponse = $this->get(route('attendance.index', [
+            'date' => now()->toDateString(),
+            'per_page' => '10',
+        ]));
         $listResponse->assertOk();
+        $listResponse->assertInertia(fn ($page) => $page
+            ->where('filters.per_page', '10')
+            ->where('attendances.per_page', 10));
     }
 
     public function test_payroll_generation_creates_payroll_and_items(): void

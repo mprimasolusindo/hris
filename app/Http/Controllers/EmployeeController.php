@@ -16,6 +16,7 @@ use App\Models\Site;
 use App\Models\User;
 use App\Services\Employee\EmployeeQueryService;
 use App\Services\Employee\EmployeeService;
+use App\Support\ListPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -33,12 +34,14 @@ class EmployeeController extends Controller
         $this->authorize('viewAny', Employee::class);
 
         $employees = $this->queryService->paginate($request);
+        $perPage = ListPaginator::resolvePerPage($request);
 
         return Inertia::render('Employees/Index', [
             'employees' => EmployeeSummaryResource::collection($employees),
             'filters' => [
                 'search' => (string) $request->query('search', ''),
                 'status' => (string) $request->query('status', ''),
+                'per_page' => is_string($perPage) ? $perPage : (string) $perPage,
             ],
             'statusOptions' => ['active', 'resigned', 'terminated', 'retired', 'suspended'],
         ]);
